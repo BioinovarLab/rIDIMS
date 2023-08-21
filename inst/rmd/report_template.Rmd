@@ -138,12 +138,16 @@ for (file in 1:nrow(samples.info) ) {
       message(" making replicates ... ")
       write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
        ':   Make replicates'),file=log.file,append=TRUE)
-      
-    save(ChromPeaks.data,
+    
+    if (debug_app==TRUE){
+      save(ChromPeaks.data,
          aggregationFun,percent.limit,
          log.file,
          file=paste0(data.folder, "variables_step_inside.Rda") 
      )
+    }
+
+
       
       chrom.data <- xcms::chromatogram(ChromPeaks.data, aggregationFun = aggregationFun)
       chrom.data.item1 <- chrom.data[1, 1]
@@ -337,14 +341,16 @@ if ( nrow(status.files) > 0 ){
   script.error <- TRUE
 }
 
-save(    data.folder,
+
+    if (debug_app==TRUE){
+      save(data.folder,
          samples.info,
          status.files,
          n.error.files,
          log.file,
          file=paste0(data.folder, "variables_step_2.Rda") 
      )
-
+    }
 
 
 #if (script.error == TRUE | nrow(status.files) == 0 ){
@@ -376,12 +382,16 @@ if ( script.error == TRUE | n.error.files == nrow(status.files) ) {
 #################
 
 set.seed(12345)
-    save(    data.folder,
+
+    
+  if (debug_app==TRUE){
+        save(data.folder,
              samples.info,
              status.files,
              merged.status.files,
              file=paste0(data.folder, "variables_step_2.Rda") 
          )
+    }
     
 write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
 ': --------------------------------------------------'),file=log.file,append=TRUE)
@@ -431,7 +441,10 @@ for (i in 1:length(processed.sps.bin) ){
   invisible(gc())
 }
 row.names(sps.bin.df) <- basename(processed.sps.bin$dataOrigin)
-save(sps.bin.df, file=paste0(data.folder,"sps.bin.df.Rda"))
+
+    if (debug_app==TRUE){
+      save(sps.bin.df, file=paste0(data.folder,"sps.bin.df.Rda"))
+    }
 
 ################
 ################  --- end of extracting mz and int
@@ -490,7 +503,10 @@ colnames(df.export)[3:ncol(df.export)] <- (as.numeric(colnames(processed.sps.bin
 
 write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Exporting processed data '),file=log.file,append=TRUE)
 write.table(x = df.export,file = paste0(data.folder, "Data","_metaboanalyst.csv"), sep=",", row.names=FALSE, quote = F)
-save(df.export, file=paste0(data.folder,"df.export.Rda"))
+
+    if (debug_app==TRUE){
+      save(df.export, file=paste0(data.folder,"df.export.Rda"))
+    }
 
 cat('\n\n File exported to: ', paste0(data.folder, "Data","_metaboanalyst.csv") ,'  \n\n') 
 
@@ -654,7 +670,12 @@ holder <- foreach::foreach(x=4:ncol(df.export.with.replicates),
 }
 
 
-save(holder, file=paste0(data.folder, "holder.replicate.Rda") )
+
+    if (debug_app==TRUE){
+      save(holder, file=paste0(data.folder, "holder.replicate.Rda") )
+    }
+
+
       write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
       ':  status -  ', formatC( 100, digits=2,format="f") , "%"),
       file=log.file,append=TRUE)
@@ -858,6 +879,14 @@ if (input.class.mean == "TRUE" & (n.total.classes > 0) ){
   
 df.export.bkp <- df.export
 
+if (QC_app==FALSE){
+   write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+  ': Remove QC class from filter '),file=log.file,append=TRUE)
+  df.export.QC <- df.export %>% filter(toupper(class)=="QC")
+  df.export <- df.export %>% filter(toupper(class)!="QC")
+}
+
+
 class.filter.features <- df.export %>%
         dplyr::mutate(replicate = as.character(merged.status.files[rownames(df.export),"replicate"]) ) %>% 
         dplyr::relocate(replicate) %>% 
@@ -916,7 +945,6 @@ if ( nrow(df.class.result) > 0){
 }else{
   cat('\n\n### No features have been removed.  \n\n') 
   df.export<-df.export.bkp
-  rm(df.export.bkp)
 }
 
 
@@ -931,6 +959,13 @@ if (ncol(df.export)==2){
   
 }else{
 
+  
+  if (QC_app==FALSE){
+    write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+    ': Append QC to processed data '),file=log.file,append=TRUE)
+    df.export <- rbind(df.export, df.export.QC )
+  }
+  
   write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Exporting filtered data per class'),file=log.file,append=TRUE)
   write.table(x = df.export,
               file = paste0(data.folder,"Data","_metaboanalyst_class_filtered_",input.class.mean.filter,".csv"), 
@@ -940,6 +975,8 @@ if (ncol(df.export)==2){
 }
   
 }
+
+  rm(df.export.bkp)
 
 ################
 ################  --- end of Class filter
@@ -988,55 +1025,56 @@ if ( n.total.classes > 0 ){
     ggplot2::theme_bw()
     print(plot.pca)
     #----------- end of pca
+
+    df.export.mean <- df.export %>% 
+                      dplyr::group_by(class) %>%
+                      dplyr::summarise(dplyr::across(tidyselect::where(is.numeric),base::mean))
+    invisible(gc())
+    
+    ################
+    ################  --- plot mean spectra - after processing
+    ################
+    
+    df.export.class.mean <- S4Vectors::DataFrame(
+        msLevel = c(rep(1L,nrow(df.export.mean))),
+        polarity = c(rep(1L,nrow(df.export.mean))),
+        id = df.export.mean$class,
+        name = df.export.mean$class)
+    
+    ## Assign m/z and intensity values.
+    df.export.class.mean$mz <- rep(list(as.numeric(colnames(df.export.mean[,3:ncol(df.export.mean)]))), nrow(df.export.mean))
+    df.export.class.mean$intensity <- lapply(as.data.frame(t(df.export.mean[,3:ncol(df.export.mean)])), unlist)
+    obj.df.export.class.mean <- Spectra::Spectra(df.export.class.mean)
+    
+    ########### end processed spectra -----
+    cat('\n\n## Spectra plot (processed data)  \n\n') 
+    
+    Spectra::plotSpectraOverlay(obj.df.export.class.mean, lwd = 2, col = cores[unique(df.export.mean$class)],
+                                main="Overlaid mean mass spectra")
+    legend("topright", col = cores[unique(df.export.mean$class)], legend = obj.df.export.class.mean$name, pch = 15)
+    
+    write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Plotting mean spectra per class'),file=log.file,append=TRUE)
+    for (m in 1:nrow(df.export.mean)){ 
+      Spectra::plotSpectra(obj.df.export.class.mean[m], lwd = 2, col = cores[obj.df.export.class.mean$name[m]],
+                                  main=obj.df.export.class.mean$name[m] )
+      legend("topright", col = cores[obj.df.export.class.mean$name[m]], legend = obj.df.export.class.mean$name[m], pch = 15)
+      
+      write.table( data.frame(mz = colnames(df.export.mean)[-1] , 
+                              int = as.numeric(df.export.mean[m,2:ncol(df.export.mean)])),
+                   file=paste0(output.folder, "mean_" ,as.character(df.export.mean[m,1]), ".csv"),  sep=";")
+      
+    }
+    
+    ################
+    ################  --- end if processed mean spectra
+    ################
+        
+        
   
   }
 
-  
-  
-df.export.mean <- df.export %>% 
-                  dplyr::group_by(class) %>%
-                  dplyr::summarise(dplyr::across(tidyselect::where(is.numeric),base::mean))
-invisible(gc())
+  #din <- data.table::fread(file="C:/Users/Planck/Documents/MTBLS117/Data_metaboanalyst_class_filtered_80.csv", header = T)
 
-################
-################  --- plot mean spectra - afte processing
-################
-
-df.export.class.mean <- S4Vectors::DataFrame(
-    msLevel = c(rep(1L,nrow(df.export.mean))),
-    polarity = c(rep(1L,nrow(df.export.mean))),
-    id = df.export.mean$class,
-    name = df.export.mean$class)
-
-## Assign m/z and intensity values.
-df.export.class.mean$mz <- rep(list(as.numeric(colnames(df.export.mean[,3:ncol(df.export.mean)]))), nrow(df.export.mean))
-df.export.class.mean$intensity <- lapply(as.data.frame(t(df.export.mean[,3:ncol(df.export.mean)])), unlist)
-
-obj.df.export.class.mean <- Spectra::Spectra(df.export.class.mean)
-
-########### end processed spectra -----
-
-cat('\n\n## Spectra plot (processed data)  \n\n') 
-
-Spectra::plotSpectraOverlay(obj.df.export.class.mean, lwd = 2, col = cores[unique(df.export.mean$class)],
-                            main="Overlaid mean mass spectra")
-legend("topright", col = cores[unique(df.export.mean$class)], legend = obj.df.export.class.mean$name, pch = 15)
-
-write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Plotting mean spectra per class'),file=log.file,append=TRUE)
-for (m in 1:nrow(df.export.mean)){ 
-  Spectra::plotSpectra(obj.df.export.class.mean[m], lwd = 2, col = cores[obj.df.export.class.mean$name[m]],
-                              main=obj.df.export.class.mean$name[m] )
-  legend("topright", col = cores[obj.df.export.class.mean$name[m]], legend = obj.df.export.class.mean$name[m], pch = 15)
-  
-  write.table( data.frame(mz = colnames(df.export.mean)[-1] , 
-                          int = as.numeric(df.export.mean[m,2:ncol(df.export.mean)])),
-               file=paste0(output.folder, "mean_" ,as.character(df.export.mean[m,1]), ".csv"),  sep=";")
-  
-}
-
-################
-################  --- end if processed mean spectra
-################
 }
 
 ```

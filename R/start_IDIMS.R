@@ -28,7 +28,7 @@
 #https://www.paulamoraga.com/blog/2022/04/12/2022-04-12-rpackages/
 
 
-start_IDIMS <- function() {
+start_IDIMS <- function(debug_app=TRUE, QC_app=TRUE) {
 
 n.cores <- parallel::detectCores() -2
 
@@ -136,11 +136,6 @@ server <- function(input, output,session) {
 
 
   }, ignoreInit = TRUE, ignoreNULL = FALSE) #end
-
-
-
-
-
 
 
   #input.msresolution
@@ -262,6 +257,8 @@ server <- function(input, output,session) {
     session.vars$data.folder <- data.folder
     session.vars$output.folder <- output.folder
     session.vars$samples.info <- samples.info
+    session.vars$debug_app <- debug_app
+    session.vars$QC_app <- QC_app
     removeModal()
 
     #@loadSupport("teste.funcoes.R")
@@ -302,26 +299,31 @@ server <- function(input, output,session) {
     input.make.heatmaps <- as.character(input$input.make.heatmaps)
     report.serial <- format(Sys.time(), "%Y_%m_%d_%H_%M_%S")
 
-    save(    data.folder,
-             output.folder,
-             input.binSize,
-             input.snthresh,
-             input.aggregationFun,
-             input.replicates,
-             input.ppm,
-             input.Tresh.RA,
-             input.subtract.group,
-             input.min.fold,
-             input.chr.limit,
-             samples.info ,
-             input.msresolution,
-             input.class.mean,
-             input.class.mean.filter,
-             input.replicate.filter,
-             input.value.replicate.filter,
-             input.make.heatmaps,
-             report.serial,
-             file=paste0(data.folder,"variables_step_1.Rda"))
+
+
+    if (debug_app==TRUE){
+      save(    data.folder,
+               output.folder,
+               input.binSize,
+               input.snthresh,
+               input.aggregationFun,
+               input.replicates,
+               input.ppm,
+               input.Tresh.RA,
+               input.subtract.group,
+               input.min.fold,
+               input.chr.limit,
+               samples.info ,
+               input.msresolution,
+               input.class.mean,
+               input.class.mean.filter,
+               input.replicate.filter,
+               input.value.replicate.filter,
+               input.make.heatmaps,
+               report.serial,
+               file=paste0(data.folder,"variables_step_1.Rda"))
+    }
+
 
     ##### check for triplicate
     # if (input.class.mean == "TRUE"){
@@ -405,10 +407,16 @@ server <- function(input, output,session) {
       ReplicateFilterValue = input.value.replicate.filter,
       MakeHeatmaps = input.make.heatmaps,
       ReportSerial = report.serial,
+      debug_app = debug_app,
+      QC_app = QC_app,
       PackageVersion = packageVersion("rIDIMS"),
       Data.folder=data.folder,
       Output.folder=output.folder)))
-    save(session.parameters,file=paste0(data.folder,"session.par.Rda"))
+
+    if (debug_app==TRUE){
+      save(session.parameters,file=paste0(data.folder,"session.par.Rda"))
+    }
+
 
     file.error <- c("")
     for (i in 1:nrow(samples.info)){
