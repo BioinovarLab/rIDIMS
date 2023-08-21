@@ -4,7 +4,7 @@
 \alias{start_IDIMS}
 \title{start_IDIMS}
 \usage{
-start_IDIMS()
+start_IDIMS(debug_app = TRUE, QC_app = TRUE)
 }
 \value{
 null
