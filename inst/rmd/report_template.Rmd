@@ -681,8 +681,8 @@ plotDat$value[plotDat$value > 0] <- 1
 
 plot.rem.feat <- ggplot2::ggplot(plotDat, aes(replicate, replicate2, col = value, fill = value)) +
   ggplot2::geom_tile() +
-  ggplot2::scale_fill_gradient2(low = "gray", mid= "#F09C2B", high = "#1FA5F0") +
-  ggplot2::scale_color_gradient2(low = "gray", mid="#F09C2B",  high = "#1FA5F0") +
+  ggplot2::scale_fill_gradient2(low = "#F5B7B1", mid= "#F5B7B1", high = "#85C1E9") +
+  ggplot2::scale_color_gradient2(low = "#F5B7B1", mid="#F5B7B1",  high = "#85C1E9") +
   ggplot2::theme(axis.ticks.x = ggplot2::element_blank(),
         axis.text.x = ggplot2::element_blank(),
         axis.title.x = ggplot2::element_text(size=10, face="bold"),

@@ -28,7 +28,6 @@
 #https://www.paulamoraga.com/blog/2022/04/12/2022-04-12-rpackages/
 
 
-
 start_IDIMS <- function() {
 
 n.cores <- parallel::detectCores() -2
