@@ -586,7 +586,7 @@ for (m in 1:nrow(df.export.mean)){
 ################  --- replicate filter
 ################
 
-
+n.total.features.replicate.filter <- 0
 if (input.replicate.filter == "TRUE"){
   
 cat('\n\n## Analyze replicates  \n\n')
