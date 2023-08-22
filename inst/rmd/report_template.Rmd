@@ -961,7 +961,7 @@ if (ncol(df.export)==2){
 }else{
 
   
-  if (QC_app==FALSE){
+if (QC_app==FALSE){
     write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
     ': Append QC to processed data '),file=log.file,append=TRUE)
     
@@ -1006,6 +1006,16 @@ if (ncol(df.export)==2){
 
 
 ```{r, echo=FALSE,warning=FALSE,message=FALSE,fig.pos='H',fig.align='center',out.width='100%',fig.height=5,fig.width=9, results='asis'}
+
+ncol.before <- ncol(df.export)
+write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+  ': Removing null columns. Total = ', ncol.before ),file=log.file,append=TRUE)
+
+df.export <- df.export[, colSums(df.export != 0, na.rm = TRUE) > 0] 
+
+write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+  ': Total removed = ', ncol.before - ncol(df.export) ),file=log.file,append=TRUE)
+
 
 if ( n.total.classes > 0 ){
 
