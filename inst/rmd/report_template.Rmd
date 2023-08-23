@@ -986,6 +986,16 @@ if (QC_app==FALSE){
 
   }
   
+  
+  ncol.before <- ncol(df.export)
+  write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+  ': Removing null columns. Total = ', ncol.before ),file=log.file,append=TRUE)
+  
+  df.export <- df.export[, colSums(df.export != 0, na.rm = TRUE) > 0] 
+  
+  write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+  ': Total removed = ', ncol.before - ncol(df.export) ),file=log.file,append=TRUE)
+  
   write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Exporting filtered data per class'),file=log.file,append=TRUE)
   write.table(x = df.export,
               file = paste0(data.folder,"Data","_metaboanalyst_class_filtered_",input.class.mean.filter,".csv"), 
@@ -1007,14 +1017,7 @@ if (QC_app==FALSE){
 
 ```{r, echo=FALSE,warning=FALSE,message=FALSE,fig.pos='H',fig.align='center',out.width='100%',fig.height=5,fig.width=9, results='asis'}
 
-ncol.before <- ncol(df.export)
-write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
-  ': Removing null columns. Total = ', ncol.before ),file=log.file,append=TRUE)
 
-df.export <- df.export[, colSums(df.export != 0, na.rm = TRUE) > 0] 
-
-write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
-  ': Total removed = ', ncol.before - ncol(df.export) ),file=log.file,append=TRUE)
 
 
 if ( n.total.classes > 0 ){
