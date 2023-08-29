@@ -66,8 +66,15 @@ ui <-
                                                   textInput("input.value.replicate.filter", "Filter replicate threshold (%)","80"),
                                                   textInput("input.subtract.group", "Subtract from the data matrix (blank/background ions class)","blank"),
                                                   textInput("input.min.fold", "Minimum fold change","3"),
-                                                  checkboxInput("input.class.mean", "Class filter (with-in)", value=TRUE),
-                                                  textInput("input.class.mean.filter", "Class filter threshold (%)","80"),
+                                                  #checkboxInput("input.class.mean", "Class filter (with-in)", value=TRUE),
+
+                                                  selectInput("input.sample.filter", "Samples filter",selectize = F,
+                                                              c("Filter all samples" = "sample.filter.all.samples",
+                                                                "Filter by class" = "sample.filter.by.class",
+                                                                "Do not filter samples" = "no.sample.filter")),
+                                                  textInput("input.class.mean.filter", "Filter threshold (%)","80"),
+
+
                                                   textInput("input.n.cores", "Number of cores",n.cores),
                                                   checkboxInput("input.make.heatmaps", "Make Heatmaps", value=FALSE)
                                      ),
@@ -114,11 +121,11 @@ server <- function(input, output,session) {
                                  samples.info=NULL)
 
   #input.class.mean
-  observeEvent(input$input.class.mean, {
-    if((input$input.class.mean=="FALSE")) {
+  observeEvent(input$input.sample.filter, {
+    if((input$input.sample.filter=="no.sample.filter")) {
       shinyjs::hide(id = "input.class.mean.filter");
     }
-    if((input$input.class.mean=="TRUE")) {
+    if((input$input.sample.filter!="no.sample.filter")) {
       shinyjs::show(id = "input.class.mean.filter");
     }
 
@@ -293,6 +300,8 @@ server <- function(input, output,session) {
     samples.info <- session.vars$samples.info
     input.msresolution<-as.character(input$input.msresolution)
     input.class.mean <- as.character(input$input.class.mean)
+    input.sample.filter <- as.character(input$input.sample.filter)
+
     input.class.mean.filter <- as.numeric(input$input.class.mean.filter)
     input.replicate.filter <- as.character(input$input.replicate.filter)
     input.value.replicate.filter <- as.numeric(input$input.value.replicate.filter)
@@ -316,6 +325,7 @@ server <- function(input, output,session) {
                samples.info ,
                input.msresolution,
                input.class.mean,
+               input.sample.filter,
                input.class.mean.filter,
                input.replicate.filter,
                input.value.replicate.filter,
@@ -325,28 +335,6 @@ server <- function(input, output,session) {
     }
 
 
-    ##### check for triplicate
-    # if (input.class.mean == "TRUE"){
-    #
-    # class.check <-  samples.info %>%
-    #     dplyr::group_by(class) %>%
-    #     dplyr::summarise(n = dplyr::n()) %>%
-    #     dplyr::mutate(check = ifelse(n %% 3 == 0, "ok", "error")) %>%
-    #     dplyr::filter(check != "ok") %>%
-    #     dplyr::group_by(check) %>%
-    #     dplyr::summarise(erro = paste(class, collapse = ", ")) %>%
-    #     dplyr::filter(check=="error")
-    #
-    #   if (nrow(class.check) > 0) {
-    #       error.msg <- paste0("The following classes must contain triplicates: ", class.check$erro[1])
-    #       showModal(modalDialog(title="Error",
-    #                             error.msg,
-    #                             easyClose = TRUE));return(NULL);
-    #     }
-    #
-    # }
-    # #return(NULL);
-
     #check input.subtract.group
       if (input.subtract.group != ""){
         if (!input.subtract.group %in% samples.info$class){
@@ -355,22 +343,6 @@ server <- function(input, output,session) {
                                 easyClose = TRUE));return(NULL);
          }
       }
-    #check input.scales
-    # if (input.msresolution=="high.res"){
-    #   vector.input.scales <- base::strsplit(input.scales,",")[[1]]
-    #   if (length(na.omit(vector.input.scales)) != 2){
-    #     showModal(modalDialog(title="Error",
-    #                           "Check scales values. They must be: <numeric>,<numeric>",
-    #                           easyClose = TRUE));return(NULL);
-    #   }
-    #   if(!all(check.all.numeric(vector.input.scales) == TRUE)){
-    #     showModal(modalDialog(title="Error",
-    #                           "Check scales values. They must be: <numeric>,<numeric>",
-    #                           easyClose = TRUE));return(NULL);
-    #   }
-    # }else{
-    #   input.scales <- "NA"
-    # }
 
 
     if (is.na(input.binSize)== TRUE){
@@ -378,13 +350,6 @@ server <- function(input, output,session) {
                             "Check binSize (low resolution) OR ppm (high resolution) values. It must be numeric.",
                             easyClose = TRUE));return(NULL);
     }
-#
-#     if (input.class.mean == TRUE){
-#       showModal(modalDialog(title="Error",
-#                             "Check binSize (low resolution) OR ppm (high resolution) values. It must be numeric.",
-#                             easyClose = TRUE));return(NULL);
-#     }
-
 
 
     showModal(modalDialog(paste0("Processing the files. Wait ...",
@@ -401,7 +366,7 @@ server <- function(input, output,session) {
       Subtract = input.subtract.group,
       MinFold = input.min.fold,
       Chr.limit = input.chr.limit,
-      ClassFilter = input.class.mean,
+      ClassFilter = input.sample.filter,
       ClassFilterValue = input.class.mean.filter,
       ReplicateFilter = input.replicate.filter,
       ReplicateFilterValue = input.value.replicate.filter,

@@ -659,14 +659,6 @@ holder <- foreach::foreach(x=4:ncol(df.export.with.replicates),
                 (cur.item.col$class %in% not.pass.replicates$class) , 3] <- 0
   cur.item.col <- cur.item.col[rownames(df.export.with.replicates),]
 
-  # if (x == floor((20/100)*ncol(df.export.with.replicates) ) | 
-  #     x == floor((50/100)*ncol(df.export.with.replicates) ) | 
-  #     x == floor((80/100)*ncol(df.export.with.replicates) )){
-  #     write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
-  #     ': status 2   -  ',  formatC( ( x/ncol(df.export.with.replicates) )*100,digits=2,format="f"), "%"),
-  #     file=log.file,append=TRUE)
-  # }
-  
   return( subset(cur.item.col, select = 3) )
 }
 
@@ -868,17 +860,22 @@ df.export <- df.export[, colSums(df.export != 0, na.rm = TRUE) > 0]
 
 n.total.classes <- length(unique(df.export$class))
 
-if (input.class.mean == "TRUE" & (n.total.classes > 0) ){
+if (input.sample.filter != "no.sample.filter" & (n.total.classes > 0) ){
 
-  cat('\n\n## Filter with-in class  \n\n') 
+  cat('\n\n## Filter samples  \n\n') 
 #cat('#### Filtering ions by class consists of removing ions, within each class, that are not present in at least ',input.class.mean.filter,'% of the samples #of the respective class.','\n\n')
  
+  df.export.bkp <- df.export
+  
+if (input.sample.filter == "sample.filter.by.class"){
+  cat('\n\n## Filter with-in class  \n\n') 
+  
   cat('#### Procedure to filter ions by class, remove ions from each class that are present in less than ',input.class.mean.filter,'% of the samples within that class.', '\n\n')
  
   write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
   ': Filtering ions by class. Limit = ', input.class.mean.filter,"%" ),file=log.file,append=TRUE)
   
-df.export.bkp <- df.export
+
 
 if (QC_app==FALSE){
    write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
@@ -961,7 +958,7 @@ if (ncol(df.export)==2){
 }else{
 
   
-if (QC_app==FALSE){
+  if (QC_app==FALSE){
     write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
     ': Append QC to processed data '),file=log.file,append=TRUE)
     
@@ -1003,8 +1000,134 @@ if (QC_app==FALSE){
   cat('\n\n File exported to: ', paste0(data.folder,"Data","_metaboanalyst_class_filtered_",input.class.mean.filter,".csv") ,'  \n\n') 
 
 }
+  # end of if sample.filter.by.class 
+
+#############################################################
+#############################################################
+#############################################################
+#############################################################
+#############################################################
+#############################################################
+
+
+}else{
+  #"Filter all samples" = "sample.filter.all.samples"
   
+    cat('\n\n## Filter all samples  \n\n') 
+  
+  cat('#### Procedure to filter ions from all samples, remove ions from samples that are present in less than ',input.class.mean.filter,'% of the dataset.', '\n\n')
+ 
+  write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+  ': Filtering ions by the limit = ', input.class.mean.filter,"%" ),file=log.file,append=TRUE)
+  
+df.export.bkp <- df.export
+
+samples.filter.features <- df.export %>%
+        dplyr::mutate(replicate = as.character(merged.status.files[rownames(df.export),"replicate"]) ) %>% 
+        dplyr::mutate(sample = as.character(merged.status.files[rownames(df.export),"sample"]) ) %>% 
+        dplyr::relocate(replicate,sample) %>% 
+        dplyr::group_by(sample, replicate) %>%
+        dplyr::summarise(dplyr::across(tidyselect::where(is.numeric),base::mean)) %>% 
+        dplyr::group_by(replicate) %>%
+        dplyr::summarise(dplyr::across(dplyr::where(is.numeric), ~sum(. > 0)/sum(!is.na(.)) )) 
+
+
+invisible(gc())
+df.class.result <- data.frame()
+n.total.features.class <- ncol(df.export)-2
+
+
+class.holder <- foreach::foreach(x=1:length(samples.filter.features$replicate),
+                           .combine = "c", .packages='dplyr') %dopar% {
+                             
+                      item.replicate <- samples.filter.features$replicate[x]
+                      
+                      class.exclude.features <- samples.filter.features %>%
+                        dplyr::filter(replicate == item.replicate) %>%
+                        dplyr::select_if(~ . < (input.class.mean.filter/100)) %>% colnames()
+                      
+                      write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+                      ':    -  Removing ', length(class.exclude.features), " features from ", item.replicate),file=log.file,append=TRUE)
+                      
+                      list(c(item.replicate, class.exclude.features))
+                  }
+
+invisible(gc())
+
+samples.filter.features <- df.export %>%
+        dplyr::mutate(replicate = as.character(merged.status.files[rownames(df.export),"replicate"]) ) %>% 
+        dplyr::mutate(sample = as.character(merged.status.files[rownames(df.export),"sample"]) ) %>% 
+        dplyr::relocate(replicate,sample) 
+
+for(list.item in class.holder){
+  if (length(list.item) == 1){
+    write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+                 ':    -  0 features to remove from ', list.item[1]),file=log.file,append=TRUE)
+  }else{
+    item.replicate <- list.item[1]
+    class.exclude.features <- list.item[2:length(list.item)]
+    samples.filter.features[samples.filter.features$replicate==item.replicate, class.exclude.features] <- 0
+    df.class.result <- rbind(df.class.result,
+                             c(item.replicate,
+                              length(class.exclude.features),
+                              formatC( ( length(class.exclude.features) / n.total.features.class)*100,
+                                      digits=2,format="f")) )
+
+  }
 }
+
+invisible(gc())
+df.export <- samples.filter.features %>% select(!c("replicate", "sample"))
+#clean zero cols from data -----------------------
+df.export <- df.export[, colSums(df.export != 0, na.rm = TRUE) > 0] 
+#-------------------------------------------------
+
+if ( nrow(df.class.result) > 0){
+  colnames(df.class.result) <- c("#", "Features removed", "Removal percentage (%)")
+  print_paged_df(df.class.result) 
+}else{
+  cat('\n\n### No features have been removed.  \n\n') 
+  df.export<-df.export.bkp
+}
+
+
+if (ncol(df.export)==2){
+  
+  cat('\n\n### Filter samples: No feature has been selected. 
+               This occurs for very high percentage values  \n\n') 
+  write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Filter samples: No feature has been selected. 
+               This occurs for very high percentage values'),file=log.file,append=TRUE)
+  
+  df.export <- df.export.bkp
+  
+}else{
+
+  
+ 
+  ncol.before <- ncol(df.export)
+  write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+  ': Removing null columns. Total = ', ncol.before ),file=log.file,append=TRUE)
+  
+  df.export <- df.export[, colSums(df.export != 0, na.rm = TRUE) > 0] 
+  
+  write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+  ': Total removed = ', ncol.before - ncol(df.export) ),file=log.file,append=TRUE)
+  
+  write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Exporting filtered data (samples)'),file=log.file,append=TRUE)
+  write.table(x = df.export,
+              file = paste0(data.folder,"Data","_metaboanalyst_class_filtered_",input.class.mean.filter,".csv"), 
+              sep=",", row.names=FALSE, quote = F)
+  cat('\n\n File exported to: ', paste0(data.folder,"Data","_metaboanalyst_class_filtered_",input.class.mean.filter,".csv") ,'  \n\n') 
+
+}
+  # end of if sample.filter
+
+  
+} 
+  
+
+  
+} #end of samples filter
 
   rm(df.export.bkp)
 
