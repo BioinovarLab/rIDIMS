@@ -984,7 +984,7 @@ if (ncol(df.export)==2){
   }
   
   
-  ncol.before <- ncol(df.export)
+  ncol.before <- ncol(df.export) -2
   write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
   ': Removing null columns. Total = ', ncol.before ),file=log.file,append=TRUE)
   
@@ -1026,101 +1026,50 @@ samples.filter.features <- df.export %>%
         dplyr::mutate(replicate = as.character(merged.status.files[rownames(df.export),"replicate"]) ) %>% 
         dplyr::mutate(sample = as.character(merged.status.files[rownames(df.export),"sample"]) ) %>% 
         dplyr::relocate(replicate,sample) %>% 
-        dplyr::group_by(sample, replicate) %>%
+        dplyr::group_by(sample) %>%
         dplyr::summarise(dplyr::across(tidyselect::where(is.numeric),base::mean)) %>% 
-        dplyr::group_by(replicate) %>%
+        dplyr::group_by(sample) %>%
         dplyr::summarise(dplyr::across(dplyr::where(is.numeric), ~sum(. > 0)/sum(!is.na(.)) )) 
 
-
-invisible(gc())
-df.class.result <- data.frame()
-n.total.features.class <- ncol(df.export)-2
-
-
-class.holder <- foreach::foreach(x=1:length(samples.filter.features$replicate),
-                           .combine = "c", .packages='dplyr') %dopar% {
-                             
-                      item.replicate <- samples.filter.features$replicate[x]
-                      
-                      class.exclude.features <- samples.filter.features %>%
-                        dplyr::filter(replicate == item.replicate) %>%
-                        dplyr::select_if(~ . < (input.class.mean.filter/100)) %>% colnames()
-                      
-                      write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
-                      ':    -  Removing ', length(class.exclude.features), " features from ", item.replicate),file=log.file,append=TRUE)
-                      
-                      list(c(item.replicate, class.exclude.features))
-                  }
+samples.filter.features.colsum <-  data.frame(Feature = colSums(samples.filter.features != 0, na.rm = TRUE))
+samples.filter.features.colsum$percent <- samples.filter.features.colsum$Feature / nrow(samples.filter.features)
+samples.filter.features.filtered <- samples.filter.features.colsum %>% filter(percent >= (input.class.mean.filter/100) )
+samples.filter.features.filtered.selected <- rownames(samples.filter.features.filtered)[2:nrow(samples.filter.features.filtered)]
 
 invisible(gc())
 
-samples.filter.features <- df.export %>%
-        dplyr::mutate(replicate = as.character(merged.status.files[rownames(df.export),"replicate"]) ) %>% 
-        dplyr::mutate(sample = as.character(merged.status.files[rownames(df.export),"sample"]) ) %>% 
-        dplyr::relocate(replicate,sample) 
-
-for(list.item in class.holder){
-  if (length(list.item) == 1){
-    write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
-                 ':    -  0 features to remove from ', list.item[1]),file=log.file,append=TRUE)
-  }else{
-    item.replicate <- list.item[1]
-    class.exclude.features <- list.item[2:length(list.item)]
-    samples.filter.features[samples.filter.features$replicate==item.replicate, class.exclude.features] <- 0
-    df.class.result <- rbind(df.class.result,
-                             c(item.replicate,
-                              length(class.exclude.features),
-                              formatC( ( length(class.exclude.features) / n.total.features.class)*100,
-                                      digits=2,format="f")) )
-
-  }
-}
-
-invisible(gc())
-df.export <- samples.filter.features %>% select(!c("replicate", "sample"))
-#clean zero cols from data -----------------------
-df.export <- df.export[, colSums(df.export != 0, na.rm = TRUE) > 0] 
-#-------------------------------------------------
-
-if ( nrow(df.class.result) > 0){
-  colnames(df.class.result) <- c("#", "Features removed", "Removal percentage (%)")
-  print_paged_df(df.class.result) 
-}else{
-  cat('\n\n### No features have been removed.  \n\n') 
-  df.export<-df.export.bkp
-}
+df.export <- df.export[,c("samples", "class",samples.filter.features.filtered.selected)]
 
 
 if (ncol(df.export)==2){
-  
-  cat('\n\n### Filter samples: No feature has been selected. 
-               This occurs for very high percentage values  \n\n') 
-  write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Filter samples: No feature has been selected. 
+
+  cat('\n\n### Filter samples: No feature has been selected.
+               This occurs for very high percentage values  \n\n')
+  write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Filter samples: No feature has been selected.
                This occurs for very high percentage values'),file=log.file,append=TRUE)
-  
+
   df.export <- df.export.bkp
-  
+
 }else{
 
-  
- 
-  ncol.before <- ncol(df.export)
+  ncol.before <- ncol(df.export)-2
+  # write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+  # ': Removing null columns. Total = ', ncol.before ),file=log.file,append=TRUE)
+
+  df.export <- df.export[, colSums(df.export != 0, na.rm = TRUE) > 0]
+
   write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
-  ': Removing null columns. Total = ', ncol.before ),file=log.file,append=TRUE)
-  
-  df.export <- df.export[, colSums(df.export != 0, na.rm = TRUE) > 0] 
-  
-  write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
-  ': Total removed = ', ncol.before - ncol(df.export) ),file=log.file,append=TRUE)
+  ': Total of removed features = ', (ncol(df.export.bkp)-2) - (ncol(df.export)-2) ),file=log.file,append=TRUE)
+
+  cat('\n\n### Total of removed features = ',(ncol(df.export.bkp)-2) - (ncol(df.export)-2) , '  \n\n') 
   
   write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Exporting filtered data (samples)'),file=log.file,append=TRUE)
   write.table(x = df.export,
-              file = paste0(data.folder,"Data","_metaboanalyst_class_filtered_",input.class.mean.filter,".csv"), 
+              file = paste0(data.folder,"Data","_metaboanalyst_samples_filtered_",input.class.mean.filter,".csv"),
               sep=",", row.names=FALSE, quote = F)
-  cat('\n\n File exported to: ', paste0(data.folder,"Data","_metaboanalyst_class_filtered_",input.class.mean.filter,".csv") ,'  \n\n') 
+  cat('\n\n File exported to: ', paste0(data.folder,"Data","_metaboanalyst_samples_filtered_",input.class.mean.filter,".csv") ,'  \n\n')
 
 }
-  # end of if sample.filter
 
   
 } 
