@@ -24,12 +24,14 @@
 
 #usethis::use_package("signal")
 #devtools::check()
+#devtools::document()
 #devtools::document(roclets = c('rd', 'collate', 'namespace'))
 #https://www.paulamoraga.com/blog/2022/04/12/2022-04-12-rpackages/
 
 
-start_rIDIMS <- function(debug_app=TRUE, QC_app=TRUE) {
-
+start_rIDIMS <- function() {
+debug_app=TRUE
+QC_app=FALSE
 n.cores <- parallel::detectCores() -2
 
 check.all.numeric <- function(vector){
@@ -61,14 +63,14 @@ ui <-
                                                   textInput("input.ppm", "ppm for grouping of mass peaks (low.res)","200"),
                                                   textInput("input.Tresh.RA", "Filter spectrum intensity by x% of maximum value","0.1"),
                                                   checkboxInput("input.replicate.filter", "Filter replicate", value=TRUE),
-                                                  textInput("input.value.replicate.filter", "Filter replicate threshold (%)","80"),
+                                                  textInput("input.value.replicate.filter", "Filter replicate threshold (%)","60"),
                                                   textInput("input.subtract.group", "Subtract from the data matrix (blank/background ions class)","blank"),
                                                   textInput("input.min.fold", "Minimum fold change","3"),
                                                   #checkboxInput("input.class.mean", "Class filter (with-in)", value=TRUE),
 
                                                   selectInput("input.sample.filter", "Samples filter",selectize = F,
                                                               c("Filter all samples" = "sample.filter.all.samples",
-                                                                #"Filter by class" = "sample.filter.by.class",
+                                                                "Filter by class" = "sample.filter.by.class",
                                                                 "Do not filter samples" = "no.sample.filter")),
                                                   textInput("input.class.mean.filter", "Filter threshold (%)","80"),
 
@@ -339,13 +341,32 @@ server <- function(input, output,session) {
 
 
     #check input.subtract.group
-      if (input.subtract.group != ""){
+     if (input.subtract.group != ""){
         if (!input.subtract.group %in% samples.info$class){
           showModal(modalDialog(title="Error",
                                 "Subtract group: Name not found.",
                                 easyClose = TRUE));return(NULL);
          }
       }
+
+    #check replicates names
+    if (input.subtract.group != ""){
+
+      grouped_data <- aggregate(class ~ replicate, samples.info, FUN = function(x) length(unique(x)))
+      multi_class_replicates <- grouped_data$replicate[grouped_data$class > 1]
+
+      if (length(multi_class_replicates) > 0) {
+
+        showModal(modalDialog(title="Error",
+                              paste("Replicate codes must be unique for each class. Duplicates:",
+                                    paste(multi_class_replicates, collapse = ", ")),
+                              easyClose = TRUE));return(NULL);
+
+      }
+
+
+
+    }
 
 
     if (is.na(input.binSize)== TRUE){

@@ -6,18 +6,23 @@
 \alias{rIDIMS-package}
 \title{rIDIMS: An R Package for Processing Intermittent and Direct Injection Mass Spectrometry Data}
 \description{
-What the package does (one paragraph).
+rIDIMS offers a simple and fast workflow to process two-dimensional mass spec data by selecting high-quality scans and features based on mass spectrum intensity, data alignment, filtering reproducible ions along sample replicates, removing background ions, and selecting ions that are more representative per class.
 }
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/felipe-mansoldo/IDIMS}
-  \item Report bugs at \url{https://github.com/felipe-mansoldo/IDIMS/issues}
+  \item \url{https://github.com/BioinovarLab/rIDIMS}
+  \item Report bugs at \url{https://github.com/BioinovarLab/rIDIMS/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Felipe Mansoldo \email{mansoldo@micro.ufrj.br} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+
+Authors:
+\itemize{
+  \item Iasmim Lopes \email{minklopes@gmail.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+}
 
 }
 \keyword{internal}

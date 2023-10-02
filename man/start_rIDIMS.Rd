@@ -4,9 +4,9 @@
 \alias{start_rIDIMS}
 \title{start_rIDIMS}
 \usage{
-start_rIDIMS(debug_app = TRUE, QC_app = TRUE)
+start_rIDIMS()
 
-start_rIDIMS(debug_app = TRUE, QC_app = TRUE)
+start_rIDIMS()
 }
 \value{
 null
