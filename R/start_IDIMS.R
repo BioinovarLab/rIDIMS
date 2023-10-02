@@ -70,7 +70,7 @@ ui <-
 
                                                   selectInput("input.sample.filter", "Samples filter",selectize = F,
                                                               c("Filter all samples" = "sample.filter.all.samples",
-                                                                "Filter by class" = "sample.filter.by.class",
+                                                                #"Filter by class" = "sample.filter.by.class",
                                                                 "Do not filter samples" = "no.sample.filter")),
                                                   textInput("input.class.mean.filter", "Filter threshold (%)","80"),
 
