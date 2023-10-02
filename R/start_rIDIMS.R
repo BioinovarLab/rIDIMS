@@ -41,8 +41,6 @@ ui <-
              tabPanel("Files process",
                       fluidPage(
                         useShinyjs(),
-                        tabsetPanel(
-                          tabPanel("", br(),
                                    sidebarLayout(
                                      sidebarPanel("Parameters",br(),
                                                   selectInput("input.msresolution", "MS Resolution",selectize = F,
@@ -104,7 +102,12 @@ ui <-
                                        ),
                                        br(),
                                      )
-                                   ))))))
+                                   ))),
+
+             tabPanel("Tutorial",
+                      fluidPage())
+
+             )
 
 clean.path <- function(path) {
   new <- gsub("\\\\", "/", path)
@@ -409,13 +412,6 @@ server <- function(input, output,session) {
     showModal(modalDialog(paste0("The process ended successfully. Check the report at: ",
                                  data.folder, report.name,".html"), footer=NULL, size = "l",
                           easyClose = TRUE))
-
-
-
-    ###############################################################
-    ###############################################################
-
-
 
 
     ###############################################################
