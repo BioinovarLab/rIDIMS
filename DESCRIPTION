@@ -22,6 +22,7 @@ Imports:
     foreach,
     ggplot2,
     MassSpecWavelet,
+    MSnbase,
     parallel,
     plotly,
     readxl,

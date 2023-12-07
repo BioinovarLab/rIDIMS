@@ -8,6 +8,7 @@
 #' @import ggplot2
 #' @importFrom dplyr select filter mutate group_by summarise across select_if %>%
 #' @importFrom xcms MatchedFilterParam snthresh findChromPeaks chromatogram filterAcquisitionNum
+#' @import MSnbase
 #' @importFrom Spectra Spectra MsBackendDataFrame bin peaksData mz intensity
 #' @import MassSpecWavelet
 #' @import writexl
