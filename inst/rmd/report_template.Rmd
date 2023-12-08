@@ -203,34 +203,10 @@ for (file in 1:nrow(samples.info) ) {
         ggplot2::theme_bw() 
       print(p1)
 
-      # cat('\n\n#### The selected scans have different numbers of peaks and different intensities, the arbitrary choice of groups can lead to a statistical difference between the triplicates. Therefore, we need to distribute the scans in each replicate so that there is no statistically significant difference between the groups.', '\n\n')
-      
-      ## --- temp
-      #((hist(temp.chrom.data$int)))
-      #cat('\n\n### Criando 3 grupos de scans balanceados para formar as triplicatas. ', '\n\n')
-      ## --- temp
-      
-      # ## --- temp
-      # 
-      # serial.reps <- (rep(c(rep(1, length.out= nrow(temp.chrom.data)/3), 
-      #                       rep(2, length.out= nrow(temp.chrom.data)/3),
-      #                       rep(3, length.out= nrow(temp.chrom.data)/3)), length.out= nrow(temp.chrom.data)))
-      # 
-      # cat('\n\n### Resultado antes a clusterização ', '\n\n')
-      # boxplot(log2(int)~ serial.reps ,data=temp.chrom.data, main="Distribuição das intensidades nas triplicatas formadas")
-      # 
-      # ## --- temp
-      
       temp.chrom.data$cluster <- anticlust::anticlustering(
         temp.chrom.data, 
         K = 3)
-      #anticlust::plot_clusters(temp.chrom.data[,1:2], clusters = temp.chrom.data$cluster)
-      
-      # ## --- temp
-      # cat('\n\n### Resultado apos a clusterização ', '\n\n')
-      # boxplot(log2(int)~cluster,data=temp.chrom.data, main="Distribuição das intensidades nas triplicatas formadas")
-      # ## --- temp
-      
+
       chrom.data.item1.df <- data.frame(cluster = temp.chrom.data$cluster, chrom.data.item1.df[rownames(temp.chrom.data),])
       ChromPeaks.data <- xcms::filterAcquisitionNum(ChromPeaks.data, chrom.data.item1.df$acquisitionNum)
       
@@ -268,8 +244,10 @@ for (file in 1:nrow(samples.info) ) {
       Biobase::fData(ChromPeaks.data)$cluster <- 1
     }
 
-    comSpec <- MSnbase::combineSpectra(ChromPeaks.data, ppm = input.ppm,
+    comSpec <- MSnbase::combineSpectra(ChromPeaks.data,
+                                ppm = input.ppm,
                                 #intensityFun = median, mzFun = median,
+                                #mzd = 1, ppm = 200,
                                 intensityFun = base::mean, mzFun = base::mean,
                                 fcol = "cluster")
 
@@ -575,6 +553,7 @@ write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Plotting mean spectra pe
 for (m in 1:nrow(df.export.mean)){
   Spectra::plotSpectra(obj.df.export.class.mean[m], lwd = 2, col = cores[obj.df.export.class.mean$name[m]] , main = "")
   legend("topright", col = cores[obj.df.export.class.mean$name[m]], legend = obj.df.export.class.mean$name[m], pch = 15)
+  abline(h = 0, lty = 1)
   
   write.table( data.frame(mz = colnames(df.export.mean)[-1] , 
                         int = as.numeric(df.export.mean[m,2:ncol(df.export.mean)])),
@@ -1172,6 +1151,7 @@ if ( n.total.classes > 0 ){
     Spectra::plotSpectraOverlay(obj.df.export.class.mean, lwd = 2, col = cores[unique(df.export.mean$class)],
                                 main="Overlaid mean mass spectra")
     legend("topright", col = cores[unique(df.export.mean$class)], legend = obj.df.export.class.mean$name, pch = 15)
+    abline(h = 0, lty = 1)
     
     write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Plotting mean spectra per class'),file=log.file,append=TRUE)
     for (m in 1:nrow(df.export.mean)){ 
