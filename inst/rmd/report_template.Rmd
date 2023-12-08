@@ -124,11 +124,13 @@ for (file in 1:nrow(samples.info) ) {
   
   if (input.msresolution=="high.res"){
     #vector.input.scales <- base::strsplit(input.scales,",")[[1]]
-    mfp <- xcms::MatchedFilterParam(binSize = 0.01)
+    #mfp <- xcms::MatchedFilterParam(binSize = 0.01)
+    mfp <- xcms::MatchedFilterParam(binSize = input.binSize)
+
     xcms::snthresh(mfp) <- input.snthresh
     ChromPeaks.data <- xcms::findChromPeaks(xcms.data, param=mfp)
   }else{
-    mfp <- xcms::MatchedFilterParam(binSize = 0.01)
+    mfp <- xcms::MatchedFilterParam(binSize = input.binSize)
     xcms::snthresh(mfp) <- input.snthresh
     ChromPeaks.data <- xcms::findChromPeaks(xcms.data, param=mfp)
   }
@@ -252,8 +254,7 @@ for (file in 1:nrow(samples.info) ) {
         Biobase::fData(ChromPeaks.data)$cluster <- chrom.data.item1.df$cluster
         write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
         ':   Make replicates: OK'),file=log.file,append=TRUE)
-        
-        
+
       }else{
         message("# Error in fData")
         write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
@@ -572,9 +573,13 @@ legend("topright", col = cores[unique(df.export.mean$class)], legend = obj.df.ex
 
 write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Plotting mean spectra per class'),file=log.file,append=TRUE)
 for (m in 1:nrow(df.export.mean)){
-  Spectra::plotSpectra(obj.df.export.class.mean[m], lwd = 2, col = cores[obj.df.export.class.mean$name[m]],
-                              main=obj.df.export.class.mean$name[m] )
+  Spectra::plotSpectra(obj.df.export.class.mean[m], lwd = 2, col = cores[obj.df.export.class.mean$name[m]] , main = "")
   legend("topright", col = cores[obj.df.export.class.mean$name[m]], legend = obj.df.export.class.mean$name[m], pch = 15)
+  
+  write.table( data.frame(mz = colnames(df.export.mean)[-1] , 
+                        int = as.numeric(df.export.mean[m,2:ncol(df.export.mean)])),
+             file=paste0(output.folder, "raw_data_mean_" ,as.character(df.export.mean[m,1]), ".csv"),  sep=";",row.names = F)
+  
 }
 
 ################
@@ -1024,6 +1029,12 @@ if (ncol(df.export)==2){
   
 df.export.bkp <- df.export
 
+      save(df.export,
+         input.class.mean.filter,
+         merged.status.files,
+         file=paste0(data.folder, "variables_debug_12072023.Rda") 
+     )
+
 samples.filter.features <- df.export %>%
         dplyr::mutate(replicate = as.character(merged.status.files[rownames(df.export),"replicate"]) ) %>% 
         dplyr::mutate(sample = as.character(merged.status.files[rownames(df.export),"sample"]) ) %>% 
@@ -1037,11 +1048,13 @@ samples.filter.features.colsum <-  data.frame(Feature = colSums(samples.filter.f
 samples.filter.features.colsum$percent <- samples.filter.features.colsum$Feature / nrow(samples.filter.features)
 samples.filter.features.filtered <- samples.filter.features.colsum %>% filter(percent >= (input.class.mean.filter/100) )
 samples.filter.features.filtered.selected <- rownames(samples.filter.features.filtered)[2:nrow(samples.filter.features.filtered)]
-
 invisible(gc())
 
-df.export <- df.export[,c("samples", "class",samples.filter.features.filtered.selected)]
-
+if (length(samples.filter.features.filtered.selected) == 2){
+  df.export <- df.export[,c("samples", "class")]
+}else{
+  df.export <- df.export[,c("samples", "class",samples.filter.features.filtered.selected)]
+}
 
 if (ncol(df.export)==2){
 
@@ -1162,13 +1175,12 @@ if ( n.total.classes > 0 ){
     
     write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Plotting mean spectra per class'),file=log.file,append=TRUE)
     for (m in 1:nrow(df.export.mean)){ 
-      Spectra::plotSpectra(obj.df.export.class.mean[m], lwd = 2, col = cores[obj.df.export.class.mean$name[m]],
-                                  main=obj.df.export.class.mean$name[m] )
+      Spectra::plotSpectra(obj.df.export.class.mean[m], lwd = 2, col = cores[obj.df.export.class.mean$name[m]], main = "" )
       legend("topright", col = cores[obj.df.export.class.mean$name[m]], legend = obj.df.export.class.mean$name[m], pch = 15)
       
       write.table( data.frame(mz = colnames(df.export.mean)[-1] , 
                               int = as.numeric(df.export.mean[m,2:ncol(df.export.mean)])),
-                   file=paste0(output.folder, "mean_" ,as.character(df.export.mean[m,1]), ".csv"),  sep=";")
+                   file=paste0(output.folder, "processed_data_mean_" ,as.character(df.export.mean[m,1]), ".csv"),  sep=";",row.names = F)
       
     }
     
