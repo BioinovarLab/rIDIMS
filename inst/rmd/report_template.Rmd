@@ -548,12 +548,13 @@ cat('\n\n## Spectra plot (raw data)  \n\n')
 Spectra::plotSpectraOverlay(obj.df.export.class.mean, lwd = 2, col = cores[unique(df.export.mean$class)],
                             main="Overlaid mean mass spectra")
 legend("topright", col = cores[unique(df.export.mean$class)], legend = obj.df.export.class.mean$name, pch = 15)
+abline(h = -0.07, lty = 1,lwd = 1.6, col="black")
 
 write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Plotting mean spectra per class'),file=log.file,append=TRUE)
 for (m in 1:nrow(df.export.mean)){
   Spectra::plotSpectra(obj.df.export.class.mean[m], lwd = 2, col = cores[obj.df.export.class.mean$name[m]] , main = "")
   legend("topright", col = cores[obj.df.export.class.mean$name[m]], legend = obj.df.export.class.mean$name[m], pch = 15)
-  abline(h = 0, lty = 1)
+  abline(h = -0.07, lty = 1,lwd = 1.6, col="black")
   
   write.table( data.frame(mz = colnames(df.export.mean)[-1] , 
                         int = as.numeric(df.export.mean[m,2:ncol(df.export.mean)])),
@@ -1008,11 +1009,11 @@ if (ncol(df.export)==2){
   
 df.export.bkp <- df.export
 
-      save(df.export,
-         input.class.mean.filter,
-         merged.status.files,
-         file=paste0(data.folder, "variables_debug_12072023.Rda") 
-     )
+     # save(df.export,
+     #     input.class.mean.filter,
+     #     merged.status.files,
+     #     file=paste0(data.folder, "variables_debug_12072023.Rda") 
+     # )
 
 samples.filter.features <- df.export %>%
         dplyr::mutate(replicate = as.character(merged.status.files[rownames(df.export),"replicate"]) ) %>% 
@@ -1151,12 +1152,20 @@ if ( n.total.classes > 0 ){
     Spectra::plotSpectraOverlay(obj.df.export.class.mean, lwd = 2, col = cores[unique(df.export.mean$class)],
                                 main="Overlaid mean mass spectra")
     legend("topright", col = cores[unique(df.export.mean$class)], legend = obj.df.export.class.mean$name, pch = 15)
-    abline(h = 0, lty = 1)
+    abline(h = -0.07, lty = 1,lwd = 1.6, col="black")
+    
+    save(obj.df.export.class.mean,
+         cores,
+         df.export.mean,
+         file=paste0(data.folder, "plot_vars_.Rda") 
+     )
+    
     
     write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Plotting mean spectra per class'),file=log.file,append=TRUE)
     for (m in 1:nrow(df.export.mean)){ 
       Spectra::plotSpectra(obj.df.export.class.mean[m], lwd = 2, col = cores[obj.df.export.class.mean$name[m]], main = "" )
       legend("topright", col = cores[obj.df.export.class.mean$name[m]], legend = obj.df.export.class.mean$name[m], pch = 15)
+      abline(h = -0.05, lty = 1,lwd = 1.6, col="black")
       
       write.table( data.frame(mz = colnames(df.export.mean)[-1] , 
                               int = as.numeric(df.export.mean[m,2:ncol(df.export.mean)])),

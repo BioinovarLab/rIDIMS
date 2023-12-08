@@ -1,6 +1,6 @@
 Package: rIDIMS
 Title: An R Package for Processing Intermittent and Direct Injection Mass Spectrometry Data
-Version: 1.7.3
+Version: 1.7.6
 Authors@R: c(person("Felipe", "Mansoldo", , "mansoldo@micro.ufrj.br", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID")),
            person("Iasmim", "Lopes", , "minklopes@gmail.com", role = c("aut"),
