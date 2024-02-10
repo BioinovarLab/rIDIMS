@@ -1,15 +1,13 @@
 Package: rIDIMS
 Title: An R Package for Processing Intermittent and Direct Injection Mass Spectrometry Data
-Version: 1.7.7
-Authors@R: c(person("Felipe", "Mansoldo", , "mansoldo@micro.ufrj.br", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID")),
-           person("Iasmim", "Lopes", , "minklopes@gmail.com", role = c("aut"),
-           comment = c(ORCID = "YOUR-ORCID-ID")))
+Version: 1.7.8
+Authors@R: c(person("Felipe", "Mansoldo", , "mansoldo@micro.ufrj.br", role = c("aut", "cre")),
+           person("Iasmim", "Lopes", , "minklopes@gmail.com", role = c("aut")))
 Description: rIDIMS offers a simple and fast workflow to process two-dimensional mass spec data by selecting high-quality scans and features based on mass spectrum intensity, data alignment, filtering reproducible ions along sample replicates, removing background ions, and selecting ions that are more representative per class.
-License: MIT + file LICENSE
+License: GNU General Public License v3.0 
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3.9000
+RoxygenNote: 7.3.1
 Suggests: 
     knitr,
     rmarkdown,
