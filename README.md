@@ -6,6 +6,10 @@
 
 Welcome to rIDIMS, an easy-to-use package designed to simplify processing your direct mass spectrometry data. This tutorial aims to help you effectively use rIDIMS and simplify parameter selection for your analysis.
 
+
+![image](https://github.com/BioinovarLab/rIDIMS/assets/47224782/0768cc0d-db0c-417d-a632-9071e85e0b0d)
+
+
 ## Installation
 
 Download the package at:
