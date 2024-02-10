@@ -4,22 +4,17 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of rIDIMS is to ...
+Welcome to rIDIMS, an easy-to-use package designed to simplify processing your direct mass spectrometry data. This tutorial aims to help you effectively use rIDIMS and simplify parameter selection for your analysis.
 
 ## Installation
 
-You can install the development version of rIDIMS like so:
+Download the package at:
 
-``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
-```
 
-## Example
-
-This is a basic example which shows you how to solve a common problem:
+## Starting the application
 
 ``` r
 library(rIDIMS)
-## basic example code
+start_rIDIMS()
 ```
 
