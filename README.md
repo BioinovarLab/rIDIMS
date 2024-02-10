@@ -9,6 +9,11 @@ Welcome to rIDIMS, an easy-to-use package designed to simplify processing your d
 ## Installation
 
 Download the package at:
+https://github.com/BioinovarLab/rIDIMS/releases/download/v1.7.7/rIDIMS_1.7.7.zip
+
+## Screenshot
+
+<img src="https://github.com/BioinovarLab/rIDIMS/assets/47224782/7f742c80-8866-463e-9b61-fba06982002b" width="600">
 
 
 ## Starting the application
@@ -24,19 +29,19 @@ start_rIDIMS()
 1- Input files 
 Make sure the files are in open data format (.mzML or .mzXML ). Then, copy the directory path and paste it into the “Spectra files directory” field. A list file containing sample information is required. If you are processing your data for the first time, click the “Make information file” button. A spreadsheet “sample.info” listing all the files in the directory is generated, and it will open automatically, or you can access it in your files directory. This file consists of four columns containing file directory location, sample name, replicates, and class information. To ensure comprehensive data processing, make sure to fill in the “replicate” and “class” columns for each sample in your dataset.
 
- ![image](https://github.com/BioinovarLab/rIDIMS/assets/47224782/a6c9b1de-6c88-486d-8180-8f875e0374a0)
+<img src="https://github.com/BioinovarLab/rIDIMS/assets/47224782/a6c9b1de-6c88-486d-8180-8f875e0374a0" width="400">
 
 
 See the example below:
 
-![image](https://github.com/BioinovarLab/rIDIMS/assets/47224782/fc978ce4-ee18-4b14-9463-9d3c259ed308)
+<img src="https://github.com/BioinovarLab/rIDIMS/assets/47224782/fc978ce4-ee18-4b14-9463-9d3c259ed308" width="400">
 
  
 ●	Note that if your dataset contains technical replicates, you can use a code, sample name, number, or letter to identify them. However, it is necessary to maintain consistency by using the same identifier for replicates of the same sample, whereas different samples require unique identifiers.
 ●	Blank/background and QC samples must be identified in the class column.
 If you have already created an "information file", then proceed by clicking the "Open information file" button to load the data. This will generate a pie chart showing the relative proportions of each sample class in the dataset. That gives you an overview of your dataset and allows you to identify potential mistakes in the previous step.
 
-![image](https://github.com/BioinovarLab/rIDIMS/assets/47224782/6158082f-3376-430b-8dfd-4ee30158763f)
+<img src="[https://github.com/BioinovarLab/rIDIMS/assets/47224782/fc978ce4-ee18-4b14-9463-9d3c259ed308](https://github.com/BioinovarLab/rIDIMS/assets/47224782/6158082f-3376-430b-8dfd-4ee30158763f)" width="400">
 
 
 
