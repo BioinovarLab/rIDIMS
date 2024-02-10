@@ -9,7 +9,7 @@ Welcome to rIDIMS, an easy-to-use package designed to simplify processing your d
 ## Installation
 
 Download the package at:
-https://github.com/BioinovarLab/rIDIMS/releases/download/v1.7.7/rIDIMS_1.7.7.zip
+https://github.com/BioinovarLab/rIDIMS/releases/download/v1.7.8/rIDIMS_1.7.8.zip
 
 ## Screenshot
 
