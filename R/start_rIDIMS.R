@@ -104,10 +104,7 @@ ui <-
                                        ),
                                        br(),
                                      )
-                                   ))),
-
-             tabPanel("Tutorial",
-                      fluidPage())
+                                   )))
 
              )
 
