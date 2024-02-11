@@ -12,8 +12,15 @@ Welcome to rIDIMS, an easy-to-use package designed to simplify processing your d
 
 ## Installation
 
-Download the package at:
+Option 1) Download the package at:
 https://github.com/BioinovarLab/rIDIMS/releases/download/v1.7.8/rIDIMS_1.7.8.zip
+
+Option 2) Installation from Github
+``` r
+devtools::install_github("BioinovarLab/rIDIMS")
+```
+
+
 
 ## Screenshot
 
@@ -52,7 +59,6 @@ If you have already created an "information file", then proceed by clicking the 
 ## Data Processing
 
 ### Parameters
-*required parameters
 
 **MS Resolution** – Select the resolution mass spectrometer (low or high) that you used to acquire the data.
 
