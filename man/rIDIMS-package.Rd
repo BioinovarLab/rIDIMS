@@ -17,11 +17,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Felipe Mansoldo \email{mansoldo@micro.ufrj.br} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Felipe Mansoldo \email{mansoldo@micro.ufrj.br}
 
 Authors:
 \itemize{
-  \item Iasmim Lopes \email{minklopes@gmail.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+  \item Iasmim Lopes \email{minklopes@gmail.com}
 }
 
 }

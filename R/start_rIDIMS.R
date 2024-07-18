@@ -189,9 +189,12 @@ server <- function(input, output,session) {
 
     data.file.names <- dir(data.folder, full.names = TRUE, pattern = ".CDF|.cdf|.mzXML|.mzML|.mzml|.MZML",recursive = T)
 
+    #shQuote(normalizePath(paste0(data.folder
+
     if (length(data.file.names) == 0){
-      showModal(modalDialog(title="Important message","Not valid folder!",
-                            easyClose = TRUE));return(NULL);}
+      showModal(modalDialog(title="Important message","Not valid folder. Can't find MS files.",
+                            easyClose = TRUE));return(NULL);
+    }
 
 
 
@@ -211,9 +214,14 @@ server <- function(input, output,session) {
 
     writexl::write_xlsx(samples.info,paste0(data.folder,"/samples.info.xlsx"))
 
-    shell.exec(normalizePath(paste0(data.folder,"samples.info.xlsx")))
 
-    #system2("open", normalizePath(paste0(data.folder,"samples.info.xlsx")))
+
+    system2("open", shQuote(normalizePath(paste0(data.folder,"samples.info.xlsx"))))
+
+    # if(.Platform$OS.type == "unix") {
+    # } else {
+    #   base::shell.exec(normalizePath(paste0(data.folder,"samples.info.xlsx")))
+    # }
 
 
     session.vars$data.folder <- data.folder
@@ -424,7 +432,7 @@ server <- function(input, output,session) {
     #print(script.error)
     removeModal()
 
-    system2("open", paste0(data.folder, report.name,".html" ))
+    system2("open", shQuote(normalizePath(paste0(data.folder, report.name,".html" ))))
 
 
     showModal(modalDialog(paste0("The process ended successfully. Check the report at: ",
