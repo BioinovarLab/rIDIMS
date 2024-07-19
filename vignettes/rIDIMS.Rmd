@@ -1,11 +1,17 @@
 ---
-title: "rIDIMS"
-output: rmarkdown::html_vignette
+title: "Description and usage of rIDIMS"
+output:
+    BiocStyle::html_document:
+        toc_float: true
 vignette: >
   %\VignetteIndexEntry{rIDIMS}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+**Authors**: Felipe Mansoldo and Iasmim Lopes <br />
+**Last modified:** `r file.info("rIDIMS.Rmd")$mtime`<br />
+**Compiled**: `r date()`
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -14,6 +20,106 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+# Introduction
+
+This document describes how to use the **R** package `rIDIMS` for the analysis of direct-injection mass spectrometry data. 
+\
+In this tutorial we will demonstrate the advantage of generating in-silico replicas in cases of limited sample analysis. Often in real analysis cases there is a physical size limitation or small sample volumes, making it only feasible to perform one injection. In these cases, it is interesting that there is a robust and reproducible statistical process for obtaining representative scans of the analyzed sample.
+
+
+# Data:  Coffea arabica and Coffea canephora Beans
+
+We used the MasSpec pen coupled to a mass spectrometer (LTQ-XL, Thermo Scientific) to quickly and directly analyze the chemical profiles of coffee beans from 2 coffee species: Coffea arabica L. (arabica) and Coffea canephora var. robust (robust). In summary, the dataset consists of 64 files divided into the following categories: blank, Arabica coffee and Robusta coffee. \
+To demonstrate the usefulness of generating in-silico replicas, in this example we will use only 3 mzML files representative of each category.
+
+# Installation
+
+The package can be installed with the `pak` package. To
+install `pak` use `install.packages("pak")`.
+\
+After that install rIDIMS:  `pak::install("xxxxx url ")`
+
+
+```{r setup, echo = T, message = FALSE, warning=FALSE}
 library(rIDIMS)
 ```
+
+# Data prepare
+
+First create a folder for your project. In this case we will create the *test_rIDIMS* folder.
+
+```{r echo = T, results = 'hide'}
+test.path <- "C:/test_rIDIMS"
+dir.create(test.path, showWarnings = FALSE)
+
+```
+
+Now let's move the coffee project files to the created folder.
+
+
+```{r echo = T, results = 'hide' }
+file.copy(list.files(system.file('extdata', package = 'rIDIMS'), 
+                     full.names = TRUE), test.path, overwrite = TRUE)
+
+
+```
+
+With the mzML files in your project folder you don't need to create anything else manually. rIDIMS will now take care of creating the spreadsheet with sample information and general processing.
+
+
+# Run rIDIMS
+
+To open rIDIMS, enter the command below and wait for the application to load.
+
+```{r echo = T, results = 'hide' }
+rIDIMS::start_rIDIMS()
+```
+
+After loading, the following screen should appear
+
+```{r echo=F, out.width="100%"}
+knitr::include_graphics("../man/figures/screen_1.png")
+```
+
+The application window is divided into two parts, on the left side we have the parameters that must be used
+in data processing. While on the right side we have sample information. \
+In the "Spectra files directory" field, enter the path of your project folder.
+In this case *C:/test_rIDIMS*, then click the button "Make information file".
+
+# Information file
+
+Depois que clicar no botão, aguarde a criação do arquivo *samples.info.xlsx* que será criado automaticamente
+na pasta do seu projeto. Ele vai abrir com o programa nativo do seu sistema para arquivos .xlsx.
+A seguinte tela é esperada.
+
+```{r echo=F, out.width="100%"}
+knitr::include_graphics("../man/figures/screen_2.png")
+```
+
+Agora preencha de acordo com as réplicas e classes de suas amostras. Neste caso só temos 3 casos: blank, arabica e canephora.
+
+```{r echo=F, out.width="100%"}
+knitr::include_graphics("../man/figures/screen_3.png")
+```
+
+Feito isto, feche o programa editor e você estará pronto para carregar os dados no aplicativo. Clique no botão "Open information file" e aguarde o carregamento dos dados. A seguinte tela deve aparecer.
+
+```{r echo=F, out.width="100%"}
+knitr::include_graphics("../man/figures/screen_4.png")
+```
+
+
+Após a averiguação das informações das amostras e a configuração dos parâmetros para o processamento, está tudo pronto para
+iniciar o processo. Para isto, clique no botão abaixo "Start process!"
+
+
+
+
+
+
+
+
+
+
+
+

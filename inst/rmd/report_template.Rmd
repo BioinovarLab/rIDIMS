@@ -197,8 +197,8 @@ for (file in 1:nrow(samples.info) ) {
       p1 <- ggplot2::ggplot(temp.visual.df, ggplot2::aes(rt, int, color = factor(cluster) ) )+
         ggplot2::geom_path(ggplot2::aes(group = 1),linewidth=0.8) +
         ggplot2::scale_color_manual(values = c("0" = "lightgray", "1" = "blue"))+
-        ggplot2::labs(title="Selected scans in blue",
-              x ="retention time", y = "intensity", color = "Type") + 
+        ggplot2::labs(title="",
+              x ="time", y = "intensity", color = "Type") + 
         guides(color="none")+
         ggplot2::theme_bw() 
       print(p1)
@@ -218,8 +218,8 @@ for (file in 1:nrow(samples.info) ) {
         ggplot2::geom_path(ggplot2::aes(group = 1),linewidth=0.8) +
         ggplot2::scale_color_manual(values = c("0" = "lightgray", "1" = '#00AFBB', "2" = '#E7B800', 
                                          "3" = '#FC4E07'))+
-        ggplot2::labs(title="Triplicates (group of scans) selected in the chromatogram",
-              x ="intensity", y = "retention time", color = "Replicate") + 
+        ggplot2::labs(title="",
+              x ="intensity", y = "time", color = "Replicate") + 
         ggplot2::theme_bw() 
       print(p2)
       cat('\n\n')
