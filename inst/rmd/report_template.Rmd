@@ -219,7 +219,7 @@ for (file in 1:nrow(samples.info) ) {
         ggplot2::scale_color_manual(values = c("0" = "lightgray", "1" = '#00AFBB', "2" = '#E7B800', 
                                          "3" = '#FC4E07'))+
         ggplot2::labs(title="",
-              x ="intensity", y = "time", color = "Replicate") + 
+              x ="time", y = "intensity", color = "Replicate") + 
         ggplot2::theme_bw() 
       print(p2)
       cat('\n\n')

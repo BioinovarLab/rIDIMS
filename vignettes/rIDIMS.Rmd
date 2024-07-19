@@ -9,7 +9,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-**Authors**: Felipe Mansoldo and Iasmim Lopes <br />
 **Last modified:** `r file.info("rIDIMS.Rmd")$mtime`<br />
 **Compiled**: `r date()`
 
@@ -88,29 +87,32 @@ In this case *C:/test_rIDIMS*, then click the button "Make information file".
 
 # Information file
 
-Depois que clicar no botão, aguarde a criação do arquivo *samples.info.xlsx* que será criado automaticamente
-na pasta do seu projeto. Ele vai abrir com o programa nativo do seu sistema para arquivos .xlsx.
-A seguinte tela é esperada.
+After clicking the button, wait for the *samples.info.xlsx* file to be created automatically
+in your project folder. It will open with your system's native program for .xlsx files.
+The following screen is expected.
 
 ```{r echo=F, out.width="100%"}
 knitr::include_graphics("../man/figures/screen_2.png")
 ```
 
-Agora preencha de acordo com as réplicas e classes de suas amostras. Neste caso só temos 3 casos: blank, arabica e canephora.
+Now fill in according to the replicas and classes of your samples. In this case we only have 3 cases: blank, arabica and canephora. It is important that the codes used for replicas of different classes are not the same. Always use distinct replica codes.
 
 ```{r echo=F, out.width="100%"}
 knitr::include_graphics("../man/figures/screen_3.png")
 ```
 
-Feito isto, feche o programa editor e você estará pronto para carregar os dados no aplicativo. Clique no botão "Open information file" e aguarde o carregamento dos dados. A seguinte tela deve aparecer.
+Once this is done, close the editor program and you will be ready to load the data into the application. Click on the "Open information file" button and wait for the data to load. The following screen should appear.
 
 ```{r echo=F, out.width="100%"}
 knitr::include_graphics("../man/figures/screen_4.png")
 ```
 
+After checking the sample information and configuring the parameters for processing, everything is ready to go.
+start the process. To do this, click on the button below "Start process!". \
+You can monitor the status of the process through a log file (.txt) that is generated in the project folder. \
+Aguarde o fim do processamento e a geração do report.
 
-Após a averiguação das informações das amostras e a configuração dos parâmetros para o processamento, está tudo pronto para
-iniciar o processo. Para isto, clique no botão abaixo "Start process!"
+# Analyzing the report
 
 
 
