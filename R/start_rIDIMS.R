@@ -20,6 +20,7 @@
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom utils packageVersion
 #' @importFrom tidyr gather
+#' @importFrom stats aggregate
 #'
 
 #usethis::use_package("signal")
@@ -357,7 +358,7 @@ server <- function(input, output,session) {
     #check replicates names
     if (input.subtract.group != ""){
 
-      grouped_data <- aggregate(class ~ replicate, samples.info, FUN = function(x) length(unique(x)))
+      grouped_data <- stats::aggregate(class ~ replicate, samples.info, FUN = function(x) length(unique(x)))
       multi_class_replicates <- grouped_data$replicate[grouped_data$class > 1]
 
       if (length(multi_class_replicates) > 0) {

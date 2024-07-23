@@ -436,8 +436,10 @@ if(.Platform$OS.type=="windows"){ # If we are on windows
   # Snow-like functionality
   cl<- parallel::makeCluster(n.cores) # adjust according to the number of available cores (CPU)
   doParallel::registerDoParallel(cl)
+  on.exit(parallel::stopCluster(cl)) 
 }else{ # If we are on unix
   # Multi Core functionality
+  options('mc.cores' = n.cores)
   doParallel::registerDoParallel(cores = n.cores)
 }
 #################parallel
@@ -1200,8 +1202,17 @@ write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': END' ),file=log.file,app
 write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Session parameters:' ),file=log.file,append=TRUE)
 write.table(format(session.parameters),file=log.file, append = TRUE, col.names = F)
 
-#Stop cluster
-parallel::stopCluster(cl)
+
+##############################
+################# parallel Stop cluster ##
+if(.Platform$OS.type=="windows"){ # If we are on windows
+  parallel::stopCluster(cl)
+}
+#################parallel Stop cluster
+###############################
+
+#
+
 
 ```
 
