@@ -4,7 +4,7 @@ Version: 1.8.2
 Authors@R: c(person("Felipe", "Mansoldo", , "mansoldo@micro.ufrj.br", role = c("aut", "cre")),
            person("Iasmim", "Lopes", , "minklopes@gmail.com", role = c("aut")))
 Description: rIDIMS offers a simple and fast workflow to process two-dimensional mass spec data by selecting high-quality scans and features based on mass spectrum intensity, data alignment, filtering reproducible ions along sample replicates, removing background ions, and selecting ions that are more representative per class.
-License: GNU General Public License v3.0 
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
