@@ -33,7 +33,7 @@ To demonstrate the usefulness of generating in-silico replicas, in this example 
 
 # Installation
 
-The package can be installed with the `pak` package. To
+The package should be installed with the `pak` package. To
 install `pak` use `install.packages("pak")`.
 \
 After that install rIDIMS:  `pak::install("xxxxx url ")`
