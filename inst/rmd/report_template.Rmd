@@ -436,7 +436,7 @@ if(.Platform$OS.type=="windows"){ # If we are on windows
   # Snow-like functionality
   cl<- parallel::makeCluster(n.cores) # adjust according to the number of available cores (CPU)
   doParallel::registerDoParallel(cl)
-  on.exit(parallel::stopCluster(cl)) 
+  #on.exit(parallel::stopCluster(cl)) 
 }else{ # If we are on unix
   # Multi Core functionality
   options('mc.cores' = n.cores)
