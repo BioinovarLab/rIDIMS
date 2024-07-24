@@ -110,12 +110,53 @@ knitr::include_graphics("../man/figures/screen_4.png")
 After checking the sample information and configuring the parameters for processing, everything is ready to go.
 start the process. To do this, click on the button below "Start process!". \
 You can monitor the status of the process through a log file (.txt) that is generated in the project folder. \
-Aguarde o fim do processamento e a geração do report.
+Wait for the processing to finish and the report to be generated.
 
 # Analyzing the report
 
+At the end of the process, the message displays the HTML report path. If the report does not open automatically, go to the project folder and open it manually.
+
+O relatório começa mostrando os principais parâmetros do processamento, sendo que a lista total dos parâmetros está no final do arquivo log.
+Depois mostra como foi a seleção dos scans das amostras exibindo o processo de seleção de scans com base na intensidade e depois a distribuição dos mesmos no conjunto de 3 réplicas. 
+Abaixo pode-se ver o chronogram bruto da amostra CA.
 
 
+```{r echo=F, out.width="100%"}
+knitr::include_graphics("../man/figures/screen_6.png")
+```
+
+Note que a seleção não segue um padrão estátisco pois ela é feita de maneira dinâmica para gerar um conjunto de amostras que não tenha diferença estatística entre sí. Mais detalhes sobre esse algoritmo pode ser encontrado no artigo da publicação. A distribuição dos scans pode ser visualizada abaixo no chronogram através das cores de cada réplica.
+
+
+```{r echo=F, out.width="100%"}
+knitr::include_graphics("../man/figures/screen_7.png")
+```
+
+Depois se inicia o processamento das amostras seguindo as seguintes etapas:
+
+* Evaluate features of replicates
+* Subtraction of blank (or other) class
+* Filter samples
+
+O efeito destas etapas pode ser visualizado através da análise de Principal component analysis (PCA) de antes e depois.
+Abaixo pode-se visualizar o PCA das amostras antes do processamento.
+
+```{r echo=F, out.width="100%"}
+knitr::include_graphics("../man/figures/screen_8.png")
+```
+
+E abaixo o PCA após o processamento.
+
+```{r echo=F, out.width="100%"}
+knitr::include_graphics("../man/figures/screen_9.png")
+```
+
+As análises geram um relatório e log com nomes específicos (data e hora), assim você pode testar diversos parâmetros diferentes e depois avaliar o desempenho comparando os arquivos gerados. \
+Cada etapa de processamento gera um arquivo .csv com o dataset da etapa formatado para ser utilizado como input no MetaboAnalyst (https://www.metaboanalyst.ca/) diretamente. Assim, você pode avaliar de forma independete o efeito de cada etapa de maneira rápida e fácil.
+
+```{r echo=F, out.width="100%"}
+knitr::include_graphics("../man/figures/screen_10.png")
+```
 
 
 
