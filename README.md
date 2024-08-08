@@ -12,8 +12,8 @@ Welcome to rIDIMS, an easy-to-use package designed to simplify processing your d
 
 ## Installation (Recommended)
 
-rIDIMS should be installed with the `pak` package. 
-`pak` will take care of rIDIMS dependencies and installs from CRAN, Bioconductor, GitHub, URLs, git repositories.
+rIDIMS should be installed with the `pak` package. `pak` is the best option because it is able to install automatically
+all dependencies from various sources such as CRAN, Bioconductor, GitHub, URLs, git repositories.
 
 1) Install `pak` package
 ``` r
@@ -21,7 +21,7 @@ install.packages("pak")
 ```
 2) Install `rIDIMS` package
 ``` r
-pak::install("xxxxx url")
+pak::install("https://github.com/BioinovarLab/rIDIMS/releases/download/v1.8.310/rIDIMS_1.8.310.tar.gz")
 ```
 
 

@@ -1,6 +1,6 @@
 Package: rIDIMS
 Title: An R Package for Processing Intermittent and Direct Injection Mass Spectrometry Data
-Version: 1.8.308
+Version: 1.8.310
 Authors@R: c(person("Felipe", "Mansoldo", , "mansoldo@micro.ufrj.br", role = c("aut", "cre")),
            person("Iasmim", "Lopes", , "minklopes@gmail.com", role = c("aut")))
 Description: rIDIMS offers a simple and fast workflow to process two-dimensional mass spec data by selecting high-quality scans and features based on mass spectrum intensity, data alignment, filtering reproducible ions along sample replicates, removing background ions, and selecting ions that are more representative per class.

@@ -182,7 +182,12 @@ server <- function(input, output,session) {
                             "File already exists!",
                             easyClose = TRUE));return(NULL);
     }
-    showModal(modalDialog("Creating the file. Please wait.", footer=NULL))
+    showModal(modalDialog(shiny::HTML("<b>Creating the file. Please wait.</b> <br>
+                          If the spreadsheet does not open automatically,
+                          find the samples.info.xlsx file in your project folder
+                          and edit it with your spreadsheet editor."), footer=NULL))
+
+
 
     if (dir.exists(paste0(data.folder,"Output_Spectra"))){
       unlink(paste0(data.folder,"Output_Spectra"),recursive=TRUE)

@@ -12,6 +12,7 @@ rIDIMS offers a simple and fast workflow to process two-dimensional mass spec da
 Useful links:
 \itemize{
   \item \url{https://github.com/BioinovarLab/rIDIMS}
+  \item \url{https://bioinovarlab.github.io/rIDIMS/}
   \item Report bugs at \url{https://github.com/BioinovarLab/rIDIMS/issues}
 }
 
