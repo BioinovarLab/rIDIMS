@@ -56,12 +56,19 @@
 <img src="https://github.com/BioinovarLab/rIDIMS/assets/47224782/0768cc0d-db0c-417d-a632-9071e85e0b0d" alt="image"><div class="figcaption">image</div>
 </div>
 <div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+<h2 id="installation-recommended">Installation (Recommended)<a class="anchor" aria-label="anchor" href="#installation-recommended"></a>
 </h2>
-<p>Option 1) Download the package at: <a href="https://github.com/BioinovarLab/rIDIMS/releases/download/v1.7.8/rIDIMS_1.7.8.zip" class="external-link uri">https://github.com/BioinovarLab/rIDIMS/releases/download/v1.7.8/rIDIMS_1.7.8.zip</a></p>
-<p>Option 2) Installation from Github</p>
+<p>rIDIMS should be installed with the <code>pak</code> package. <code>pak</code> will take care of rIDIMS dependencies and installs from CRAN, Bioconductor, GitHub, URLs, git repositories.</p>
+<ol style="list-style-type: decimal">
+<li>Install <code>pak</code> package</li>
+</ol>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"BioinovarLab/rIDIMS"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pak"</span><span class="op">)</span></span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>Install <code>rIDIMS</code> package</li>
+</ol>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="st">"xxxxx url"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="screenshot">Screenshot<a class="anchor" aria-label="anchor" href="#screenshot"></a>
@@ -71,19 +78,23 @@
 <div class="section level2">
 <h2 id="starting-the-application">Starting the application<a class="anchor" aria-label="anchor" href="#starting-the-application"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/BioinovarLab/rIDIMS" class="external-link">rIDIMS</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/start_rIDIMS.html">start_rIDIMS</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="tutorial">Tutorial<a class="anchor" aria-label="anchor" href="#tutorial"></a>
+<h2 id="brief-tutorial">Brief tutorial<a class="anchor" aria-label="anchor" href="#brief-tutorial"></a>
 </h2>
+<div class="section level3">
+<h3 id="for-the-extended-tutorial-see-our-vignette">For the extended tutorial see our vignette.<a class="anchor" aria-label="anchor" href="#for-the-extended-tutorial-see-our-vignette"></a>
+</h3>
 <p>1- Input files Make sure the files are in open data format (.mzML or .mzXML ). Then, copy the directory path and paste it into the “Spectra files directory” field. A list file containing sample information is required. If you are processing your data for the first time, click the “Make information file” button. A spreadsheet “sample.info” listing all the files in the directory is generated, and it will open automatically, or you can access it in your files directory. This file consists of four columns containing file directory location, sample name, replicates, and class information. To ensure comprehensive data processing, make sure to fill in the “replicate” and “class” columns for each sample in your dataset.</p>
 <p><img src="https://github.com/BioinovarLab/rIDIMS/assets/47224782/a6c9b1de-6c88-486d-8180-8f875e0374a0" width="400"></p>
 <p>See the example below:</p>
 <p><img src="https://github.com/BioinovarLab/rIDIMS/assets/47224782/fc978ce4-ee18-4b14-9463-9d3c259ed308" width="400"></p>
 <p>● Note that if your dataset contains technical replicates, you can use a code, sample name, number, or letter to identify them. However, it is necessary to maintain consistency by using the same identifier for replicates of the same sample, whereas different samples require unique identifiers. ● Blank/background and QC samples must be identified in the class column. If you have already created an “information file”, then proceed by clicking the “Open information file” button to load the data. This will generate a pie chart showing the relative proportions of each sample class in the dataset. That gives you an overview of your dataset and allows you to identify potential mistakes in the previous step.</p>
 <p><img src="%5Bhttps://github.com/BioinovarLab/rIDIMS/assets/47224782/fc978ce4-ee18-4b14-9463-9d3c259ed308%5D(https://github.com/BioinovarLab/rIDIMS/assets/47224782/6158082f-3376-430b-8dfd-4ee30158763f)" width="400"></p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="data-processing">Data Processing<a class="anchor" aria-label="anchor" href="#data-processing"></a>
