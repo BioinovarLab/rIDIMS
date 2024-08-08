@@ -43,7 +43,7 @@ After that install rIDIMS:  `pak::install("xxxxx url ")`
 library(rIDIMS)
 ```
 
-# Data prepare
+# Data preparation
 
 First create a folder for your project. In this case we will create the *test_rIDIMS* folder.
 
