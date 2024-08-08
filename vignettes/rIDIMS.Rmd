@@ -116,43 +116,42 @@ Wait for the processing to finish and the report to be generated.
 
 At the end of the process, the message displays the HTML report path. If the report does not open automatically, go to the project folder and open it manually.
 
-O relatório começa mostrando os principais parâmetros do processamento, sendo que a lista total dos parâmetros está no final do arquivo log.
-Depois mostra como foi a seleção dos scans das amostras exibindo o processo de seleção de scans com base na intensidade e depois a distribuição dos mesmos no conjunto de 3 réplicas. 
-Abaixo pode-se ver o chronogram bruto da amostra CA.
+The report begins by showing the main processing parameters, with the total list of parameters at the end of the log file.
+It then shows how the sample scans were selected, showing the scan selection process based on intensity and then their distribution in the set of 3 replicates.\ 
+Below you can see the raw chronogram of the CA sample.
 
 
 ```{r echo=F, out.width="100%"}
 knitr::include_graphics("../man/figures/screen_6.png")
 ```
 
-Note que a seleção não segue um padrão estátisco pois ela é feita de maneira dinâmica para gerar um conjunto de amostras que não tenha diferença estatística entre sí. Mais detalhes sobre esse algoritmo pode ser encontrado no artigo da publicação. A distribuição dos scans pode ser visualizada abaixo no chronogram através das cores de cada réplica.
-
+Note that the selection does not follow a static pattern as it is done dynamically to generate a set of scans that have no statistical difference between them. More details about this algorithm can be found in the publication's article. The distribution of scans can be viewed below in the chronogram through the colors of each replica.
 
 ```{r echo=F, out.width="100%"}
 knitr::include_graphics("../man/figures/screen_7.png")
 ```
 
-Depois se inicia o processamento das amostras seguindo as seguintes etapas:
+Then, sample processing begins following the following steps:
 
 * Evaluate features of replicates
 * Subtraction of blank (or other) class
 * Filter samples
 
-O efeito destas etapas pode ser visualizado através da análise de Principal component analysis (PCA) de antes e depois.
-Abaixo pode-se visualizar o PCA das amostras antes do processamento.
+The effect of these steps can be visualized through Principal Component Analysis (PCA) before and after processing.
+Below you can see the PCA of the samples before processing.
 
 ```{r echo=F, out.width="100%"}
 knitr::include_graphics("../man/figures/screen_8.png")
 ```
 
-E abaixo o PCA após o processamento.
+And below the PCA after processing.
 
 ```{r echo=F, out.width="100%"}
 knitr::include_graphics("../man/figures/screen_9.png")
 ```
 
-As análises geram um relatório e log com nomes específicos (data e hora), assim você pode testar diversos parâmetros diferentes e depois avaliar o desempenho comparando os arquivos gerados. \
-Cada etapa de processamento gera um arquivo .csv com o dataset da etapa formatado para ser utilizado como input no MetaboAnalyst (https://www.metaboanalyst.ca/) diretamente. Assim, você pode avaliar de forma independete o efeito de cada etapa de maneira rápida e fácil.
+The analyzes generate a report and log with specific names (date and time), so you can test several different parameters and then evaluate performance by comparing the generated files. \
+Each processing step generates a .csv file with the step's dataset formatted to be used as input in MetaboAnalyst (https://www.metaboanalyst.ca/) directly. This way, you can independently evaluate the effect of each step quickly and easily.
 
 ```{r echo=F, out.width="100%"}
 knitr::include_graphics("../man/figures/screen_10.png")
