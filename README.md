@@ -10,16 +10,19 @@ Welcome to rIDIMS, an easy-to-use package designed to simplify processing your d
 ![image](https://github.com/BioinovarLab/rIDIMS/assets/47224782/0768cc0d-db0c-417d-a632-9071e85e0b0d)
 
 
-## Installation
+## Installation (Recommended)
 
-Option 1) Download the package at:
-https://github.com/BioinovarLab/rIDIMS/releases/download/v1.7.8/rIDIMS_1.7.8.zip
+rIDIMS should be installed with the `pak` package. 
+`pak` will take care of rIDIMS dependencies and installs from CRAN, Bioconductor, GitHub, URLs, git repositories.
 
-Option 2) Installation from Github
+1) Install `pak` package
 ``` r
-devtools::install_github("BioinovarLab/rIDIMS")
+install.packages("pak")
 ```
-
+2) Install `rIDIMS` package
+``` r
+pak::install("xxxxx url")
+```
 
 
 ## Screenshot
@@ -34,8 +37,9 @@ library(rIDIMS)
 start_rIDIMS()
 ```
 
-## Tutorial
+## Brief tutorial
 
+### For the extended tutorial see our vignette.
 
 1- Input files 
 Make sure the files are in open data format (.mzML or .mzXML ). Then, copy the directory path and paste it into the “Spectra files directory” field. A list file containing sample information is required. If you are processing your data for the first time, click the “Make information file” button. A spreadsheet “sample.info” listing all the files in the directory is generated, and it will open automatically, or you can access it in your files directory. This file consists of four columns containing file directory location, sample name, replicates, and class information. To ensure comprehensive data processing, make sure to fill in the “replicate” and “class” columns for each sample in your dataset.
