@@ -36,7 +36,7 @@ To demonstrate the usefulness of generating in-silico replicas, in this example 
 The package should be installed with the `pak` package. To
 install `pak` use `install.packages("pak")`.
 \
-After that install rIDIMS:  `pak::install("https://github.com/BioinovarLab/rIDIMS/releases/download/v1.8.310/rIDIMS_1.8.310.tar.gz")`
+After that install rIDIMS:  `pak::pkg_install("url::https://github.com/BioinovarLab/rIDIMS/releases/download/v1.8.310/rIDIMS_1.8.310.tar.gz")`
 
 
 ```{r setup, echo = T, message = FALSE, warning=FALSE}

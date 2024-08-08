@@ -21,7 +21,7 @@ install.packages("pak")
 ```
 2) Install `rIDIMS` package
 ``` r
-pak::install("https://github.com/BioinovarLab/rIDIMS/releases/download/v1.8.310/rIDIMS_1.8.310.tar.gz")
+pak::pkg_install("url::https://github.com/BioinovarLab/rIDIMS/releases/download/v1.8.310/rIDIMS_1.8.310.tar.gz")
 ```
 
 
