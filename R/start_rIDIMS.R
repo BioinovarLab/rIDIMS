@@ -23,6 +23,7 @@
 #' @importFrom stats aggregate
 #'
 
+#
 #usethis::use_package("signal")
 #devtools::check()
 #devtools::document()
