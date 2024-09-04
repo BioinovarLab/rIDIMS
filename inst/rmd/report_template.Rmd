@@ -1199,7 +1199,7 @@ if ( n.total.classes > 0 ){
 ```{r, echo=FALSE,warning=FALSE,message=FALSE,fig.pos='H',fig.align='center',out.width='100%',fig.height=5,fig.width=9, results='asis'}
 
 write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': END' ),file=log.file,append=TRUE)
-write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Session parameters:' ),file=log.file,append=TRUE)
+write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Session parameters: ' ),file=log.file,append=TRUE)
 write.table(format(session.parameters),file=log.file, append = TRUE, col.names = F)
 
 
