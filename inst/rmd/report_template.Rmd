@@ -1200,8 +1200,25 @@ if ( n.total.classes > 0 ){
 
 write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': END' ),file=log.file,append=TRUE)
 write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Session parameters: ' ),file=log.file,append=TRUE)
-write.table(format(session.parameters),file=log.file, append = TRUE, col.names = F)
+#write.table(format(session.parameters),file=log.file, append = TRUE, col.names = F)
 
+write(paste0( "Resolution mode = " , as.character(session.parameters[1,1]) ),file=log.file,append=TRUE)
+write(paste0( "BinSize.PPM = " ,     as.character(session.parameters[2,1]) ),file=log.file,append=TRUE)
+write(paste0( "SNR treshold = " , as.character(session.parameters[3,1]) ),file=log.file,append=TRUE)
+write(paste0( "aggregationFun = " , as.character(session.parameters[4,1]) ),file=log.file,append=TRUE)
+write(paste0( "Make replicates = " , as.character(session.parameters[5,1]) ),file=log.file,append=TRUE)
+write(paste0( "PPM of mass peaks grouping = " , as.character(session.parameters[6,1]) ),file=log.file,append=TRUE)
+write(paste0( "Filter spectrum intensity by = " , as.character(session.parameters[7,1]) ),file=log.file,append=TRUE)
+write(paste0( "Name of the class to subtract = " , as.character(session.parameters[8,1]) ),file=log.file,append=TRUE)
+write(paste0( "Minimum fold change = " , as.character(session.parameters[9,1]) ),file=log.file,append=TRUE)
+write(paste0( "Filter chromatogram by = " , as.character(session.parameters[10,1]) ),file=log.file,append=TRUE)
+write(paste0( "Class filter type = " , as.character(session.parameters[11,1]) ),file=log.file,append=TRUE)
+write(paste0( "Class filter value = " , as.character(session.parameters[12,1]) ),file=log.file,append=TRUE)
+write(paste0( "Replicate filter = " , as.character(session.parameters[13,1]) ),file=log.file,append=TRUE)
+write(paste0( "Replicate value = " , as.character(session.parameters[14,1]) ),file=log.file,append=TRUE)
+write(paste0( "Make heatmaps = " , as.character(session.parameters[15,1]) ),file=log.file,append=TRUE)
+write(paste0( "Report code = " , as.character(session.parameters[16,1]) ),file=log.file,append=TRUE)
+write(paste0( "Data folder = " , as.character(session.parameters[20,1]) ),file=log.file,append=TRUE)
 
 ##############################
 ################# parallel Stop cluster ##
