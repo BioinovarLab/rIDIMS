@@ -1215,7 +1215,7 @@ write(paste0( "Filter chromatogram by = " , as.character(session.parameters[10,1
 write(paste0( "Class filter type = " , as.character(session.parameters[11,1]) ),file=log.file,append=TRUE)
 write(paste0( "Class filter value = " , as.character(session.parameters[12,1]) ),file=log.file,append=TRUE)
 write(paste0( "Replicate filter = " , as.character(session.parameters[13,1]) ),file=log.file,append=TRUE)
-write(paste0( "Replicate value = " , as.character(session.parameters[14,1]) ),file=log.file,append=TRUE)
+write(paste0( "Replicate filter value = " , as.character(session.parameters[14,1]) ),file=log.file,append=TRUE)
 write(paste0( "Make heatmaps = " , as.character(session.parameters[15,1]) ),file=log.file,append=TRUE)
 write(paste0( "Report code = " , as.character(session.parameters[16,1]) ),file=log.file,append=TRUE)
 write(paste0( "Data folder = " , as.character(session.parameters[20,1]) ),file=log.file,append=TRUE)
