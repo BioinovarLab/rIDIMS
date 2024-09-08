@@ -13,6 +13,7 @@ vignette: >
 **Compiled**: `r date()`
 
 ```{r, include = FALSE}
+options(knitr.duplicate.label = "allow")
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -35,20 +36,20 @@ To demonstrate the usefulness of generating in-silico replicas, in this example 
 
 The package should be installed with the `pak` package. To
 install `pak` use:
-```{r setup, echo = T, message = FALSE, warning=FALSE}
+```{r setup1, echo = T, message = FALSE, warning=FALSE, eval=FALSE}
 install.packages("pak")
 ```
 \
 After that install rIDIMS: 
 
-```{r setup, echo = T, message = FALSE, warning=FALSE}
+```{r setup2, echo = T, message = FALSE, warning=FALSE, eval=FALSE}
 pak::pkg_install("url::https://github.com/BioinovarLab/rIDIMS/releases/download/v1.8.310/rIDIMS_1.8.310.tar.gz")
 ```
 
 \
 Start rIDIMS application: 
 
-```{r setup, echo = T, message = FALSE, warning=FALSE}
+```{r setup3, echo = T, message = FALSE, warning=FALSE}
 library(rIDIMS)
 ```
 

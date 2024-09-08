@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rIDIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.8.310</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.8.421</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,7 @@
 
     
     
-<p><strong>Last modified:</strong> 2024-08-08 12:57:37<br><strong>Compiled</strong>: Thu Aug 8 12:59:03 2024</p>
+<p><strong>Last modified:</strong> 2024-09-08 13:04:07<br><strong>Compiled</strong>: Sun Sep 8 13:33:38 2024</p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -91,10 +91,16 @@ category.</p>
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>The package should be installed with the <code>pak</code> package. To
-install <code>pak</code> use <code>install.packages("pak")</code>.<br>
-After that install rIDIMS:
-<code>pak::pkg_install("url::https://github.com/BioinovarLab/rIDIMS/releases/download/v1.8.310/rIDIMS_1.8.310.tar.gz")</code></p>
+install <code>pak</code> use:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pak"</span><span class="op">)</span></span></code></pre></div>
+<p><br>
+After that install rIDIMS:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"url::https://github.com/BioinovarLab/rIDIMS/releases/download/v1.8.310/rIDIMS_1.8.310.tar.gz"</span><span class="op">)</span></span></code></pre></div>
+<p><br>
+Start rIDIMS application:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/BioinovarLab/rIDIMS" class="external-link">rIDIMS</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -102,11 +108,11 @@ After that install rIDIMS:
 </h2>
 <p>First create a folder for your project. In this case we will create
 the <em>test_rIDIMS</em> folder.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">test.path</span> <span class="op">&lt;-</span> <span class="st">"C:/test_rIDIMS"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">test.path</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>Now let’s move the coffee project files to the created folder.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata'</span>, package <span class="op">=</span> <span class="st">'rIDIMS'</span><span class="op">)</span>, </span>
 <span>                     full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">test.path</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>With the mzML files in your project folder you don’t need to create
@@ -118,7 +124,7 @@ spreadsheet with sample information and general processing.</p>
 </h2>
 <p>To open rIDIMS, enter the command below and wait for the application
 to load.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">rIDIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/start_rIDIMS.html">start_rIDIMS</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>After loading, the following screen should appear</p>
 <p><img src="../reference/figures/screen_1.png" width="100%"></p>
@@ -204,7 +210,7 @@ easily.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.9000.</p>
 </div>
 
     </footer>
