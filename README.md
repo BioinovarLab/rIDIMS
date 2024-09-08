@@ -39,7 +39,9 @@ start_rIDIMS()
 
 ## Brief tutorial
 
-### For the extended tutorial see our vignette.
+### [Click here for the extended tutorial.](https://bioinovarlab.github.io/rIDIMS/articles/rIDIMS.html)
+
+
 
 1- Input files 
 Make sure the files are in open data format (.mzML or .mzXML ). Then, copy the directory path and paste it into the “Spectra files directory” field. A list file containing sample information is required. If you are processing your data for the first time, click the “Make information file” button. A spreadsheet “sample.info” listing all the files in the directory is generated, and it will open automatically, or you can access it in your files directory. This file consists of four columns containing file directory location, sample name, replicates, and class information. To ensure comprehensive data processing, make sure to fill in the “replicate” and “class” columns for each sample in your dataset.
