@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-This document describes how to use the **R** package `rIDIMS` for the analysis of direct-injection mass spectrometry data. 
+This document describes how to use the **R package** `rIDIMS` for the analysis of direct-injection mass spectrometry data. 
 \
 In this tutorial we will demonstrate the advantage of generating in-silico replicas in cases of limited sample analysis. Often in real analysis cases there is a physical size limitation or small sample volumes, making it only feasible to perform one injection. In these cases, it is interesting that there is a robust and reproducible statistical process for obtaining representative scans of the analyzed sample.
 
