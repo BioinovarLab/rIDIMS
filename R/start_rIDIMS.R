@@ -61,7 +61,7 @@ ui <-
                                                                selected = "sum",
                                                                inline = TRUE),
                                                   textInput("input.chr.limit", "Filter chromatogram by x% of maximum value","10"),
-                                                  checkboxInput("input.replicates", "Make 3 replicates / sample", value=TRUE),
+                                                  checkboxInput("input.replicates", "Make 3 replicates / sample", value=FALSE),
                                                   textInput("input.ppm", "ppm for grouping of mass peaks (low.res)","200"),
                                                   textInput("input.Tresh.RA", "Filter spectrum intensity by x% of maximum value","0.1"),
                                                   checkboxInput("input.replicate.filter", "Filter replicate", value=TRUE),
