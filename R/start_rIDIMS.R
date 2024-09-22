@@ -23,16 +23,10 @@
 #' @importFrom stats aggregate
 #'
 
-#
-#usethis::use_package("signal")
-#devtools::check()
-#devtools::document()
-#devtools::document(roclets = c('rd', 'collate', 'namespace'))
-#https://www.paulamoraga.com/blog/2022/04/12/2022-04-12-rpackages/
 
 
 start_rIDIMS <- function() {
-debug_app=TRUE
+debug_app=FALSE
 QC_app=FALSE
 n.cores <- parallel::detectCores() -2
 
@@ -52,9 +46,6 @@ ui <-
                                                                 "High Resolution" = "high.res")),
                                                   textInput("input.binSize", "binSize (Dalton)","1"),
                                                   textInput("input.snthresh", "SNR threshold","1"),
-                                                  #hidden(textInput("input.scales", "Scales (MSWParam)","1,4")),
-                                                  #hidden(textInput("input.peakThr", "Peak Thr (MSWParam)","1000")),
-                                                  #hidden(textInput("input.ampTh", "Amp. Th (MSWParam)","0.001")),
                                                   radioButtons(inputId = "input.aggregationFun",
                                                                label = "AggregationFun of chromatogram",
                                                                choices = c("sum (TIC)" = "sum", "max (BPC)" = "max"),
