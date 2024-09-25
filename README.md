@@ -24,18 +24,22 @@ install.packages("pak")
 pak::pkg_install("url::https://github.com/BioinovarLab/rIDIMS/releases/download/v0.5.00/rIDIMS_0.5.00.tar.gz")
 ```
 
+## Start the application
+
+``` r
+library(rIDIMS)
+start_rIDIMS()
+```
 
 ## Screenshot
 
 <img src="https://github.com/BioinovarLab/rIDIMS/assets/47224782/7f742c80-8866-463e-9b61-fba06982002b" width="600">
 
 
-## Starting the application
+## Prerequisites:
+* **Windows:** Install latest version of *[Rtools](http://cran.r-project.org/bin/windows/Rtools)*. It is advised to install in the default location which is C:\Rtools.
+* **Linux:** Make sure to have `r-base-dev` installed *[HowTO](https://cran.r-project.org/bin/linux/debian/)*. 
 
-``` r
-library(rIDIMS)
-start_rIDIMS()
-```
 
 ### [Click here for the extended tutorial.](https://bioinovarlab.github.io/rIDIMS/articles/rIDIMS.html)
 
