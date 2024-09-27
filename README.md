@@ -4,15 +4,14 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-Welcome to rIDIMS, an easy-to-use application/package designed to simplify processing your direct mass spectrometry data. \ 
-Spectra obtained by direct-infusion mass spectrometry (DIMS) can be challenging. There may be few samples and/or samples with limited surface area. In these cases, the chronogram presents challenging curves for processing. Many existing algorithms are not prepared to process regions with zeroed scans, for example. \ 
+Welcome to rIDIMS, an easy-to-use application/package designed to simplify processing your direct mass spectrometry data.
+Spectra obtained by direct-infusion mass spectrometry (DIMS) can be challenging. There may be few samples and/or samples with limited surface area. In these cases, the chronogram presents challenging curves for processing. Many existing algorithms are not prepared to process regions with zeroed scans, for example. 
 rIDIMS emerges as the ideal tool for processing DIMS data with an innovation in reproducible and statistically robust scan selection.
 See a typical example of a chronogram below.
 
+![TICs_example](https://github.com/user-attachments/assets/4b28a772-f193-4e64-aca8-14f63907f431)
 
-#![image](https://github.com/BioinovarLab/rIDIMS/assets/47224782/0768cc0d-db0c-417d-a632-9071e85e0b0d)
-
-This example is from a single sample. Note that is this single run (injection) there are TICs with *valid* and *invalid scans* (regions with zeroed scans and noise). \ 
+This example is from a single sample. Note that in this single run (injection) there are TICs with *valid* and *invalid scans* (regions with zeroed scans and noise). 
 The goal is to extract valid scans from this spectrum in a rational manner. To do this, the rIDIMS algorithm removes regions with zeroed scans and noise, and then selects TICs that present values above an established threshold.
 
 
