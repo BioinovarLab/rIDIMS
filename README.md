@@ -4,7 +4,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-Welcome to rIDIMS, an easy-to-use application/package designed to simplify processing your direct-infusion mass spectrometry (DIMS).
+Welcome to rIDIMS, an easy-to-use application/package designed to simplify processing direct-infusion mass spectrometry (DIMS) data.
 Spectra obtained by DIMS can be challenging. There may be few samples and/or samples with limited surface area. In these cases, the chronogram presents challenging curves for processing. Many existing algorithms are not prepared to process regions with zeroed scans, for example. 
 rIDIMS emerges as the ideal tool for processing DIMS data with an innovation in reproducible and statistically robust scan selection.
 See a typical example of a chronogram below.
