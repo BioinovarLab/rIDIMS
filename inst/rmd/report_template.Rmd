@@ -255,66 +255,84 @@ for (file in 1:nrow(samples.info) ) {
   
     
 ################### --------->>>>>
+
+  if (input.isotopes.adducts == TRUE){
     
-spectra_data_iso_adduct <- spectra(ChromPeaks.data)
-# Carregar o pacote necessário
-library(InterpretMSSpectrum)
+    write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+    ':   Grouping of Isotopes and Adducts'),file=log.file,append=TRUE)
+  
+    spectra_data_iso_adduct <- xcms::spectra(ChromPeaks.data)
 
-# Criar uma lista para armazenar os resultados de findMAIN
-all_adducts_list <- vector("list", length(spectra_data_iso_adduct))
-# Loop para processar cada espectro
-for (iso_cc in seq_along(spectra_data_iso_adduct)[1:4]  ) {
-  # Extrair o espectro atual
-  current_spectrum <- spectra_data_iso_adduct[[iso_cc]]
-  
-  # Extrair os valores de m/z e intensidade do espectro atual
-  mz_values <- mz(current_spectrum)
-  intensity_values <- intensity(current_spectrum)
-  
-  # Criar um data frame para o espectro atual
-  current_spectra_df <- data.frame(
-    mz = mz_values,
-    intensity = intensity_values
-  )
-  
-  # Usar a função findMAIN() para analisar o espectro
-  main_result <- summary(findMAIN(spec = current_spectra_df))
-  #colnames:  [1] "adductmz"          "adducthyp"         "neutral_mass"      "adducts_explained" "medppm"            "int_perc"      #[7] "mass_score"        "int_score"         "supp_isos"         "total_score" 
-
-   # Filtrar resultados não nulos de adducthyp
-  filtered_result <- main_result[!is.na(main_result$adducthyp ), ]
-    # Selecionar o máximo total_score
-  if (nrow(filtered_result) > 0) {
-    max_score_result <- filtered_result[which.max(filtered_result$total_score), ]
-    max_score_result$intensity <- 0
-    for (adduct_cc in 1:nrow(max_score_result)  ) {
-      adduct_mz = max_score_result$adductmz[adduct_cc]
-      adduct_mz_find = which( round(current_spectra_df$mz, 4) == adduct_mz)
-      adduct_mz_find = adduct_mz_find[1]
-      adduct_mz_int = current_spectra_df$intensity[adduct_mz_find]
-      max_score_result$intensity[adduct_cc] <- adduct_mz_int
+    # Criar uma lista para armazenar os resultados de findMAIN
+    all_adducts_list <- vector("list", length(spectra_data_iso_adduct))
+    # Loop para processar cada espectro
+    for (iso_cc in seq_along(spectra_data_iso_adduct) ) {
+      
+      # Imprimir progresso em blocos de 10%
+      if (iso_cc %% ceiling(length(spectra_data_iso_adduct) / 10) == 0) {
+        progresso_cc_str <- round(iso_cc / length(spectra_data_iso_adduct),2)*100
+        
+        write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+        ':   Grouping: ', progresso_cc_str, "%"),file=log.file,append=TRUE)
+        
+      }
+      
+      # Extrair o espectro atual
+      current_spectrum <- spectra_data_iso_adduct[[iso_cc]]
+      
+      # Extrair os valores de m/z e intensidade do espectro atual
+      mz_values <- mz(current_spectrum)
+      intensity_values <- intensity(current_spectrum)
+      
+      # Criar um data frame para o espectro atual
+      current_spectra_df <- data.frame(
+        mz = mz_values,
+        intensity = intensity_values
+      )
+      
+      # Usar a função findMAIN() para analisar o espectro
+      main_result <- summary(InterpretMSSpectrum::findMAIN(spec = current_spectra_df))
+      #colnames:  [1] "adductmz"          "adducthyp"         "neutral_mass"      "adducts_explained" "medppm"                   "int_perc"      #[7] "mass_score"        "int_score"         "supp_isos"         "total_score" 
+    
+       # Filtrar resultados não nulos de adducthyp
+      filtered_result <- main_result[!is.na(main_result$adducthyp ), ]
+        # Selecionar o máximo total_score
+      if (nrow(filtered_result) > 0) {
+        max_score_result <- filtered_result[which.max(filtered_result$total_score), ]
+        max_score_result$intensity <- 0
+        for (adduct_cc in 1:nrow(max_score_result)  ) {
+          adduct_mz = max_score_result$adductmz[adduct_cc]
+          adduct_mz_find = which( round(current_spectra_df$mz, 4) == adduct_mz)
+          adduct_mz_find = adduct_mz_find[1]
+          adduct_mz_int = current_spectra_df$intensity[adduct_mz_find]
+          max_score_result$intensity[adduct_cc] <- adduct_mz_int
+        }
+      # Armazenar o resultado
+      all_adducts_list[[iso_cc]] <- max_score_result
+      }
+    
     }
-  # Armazenar o resultado
-  all_adducts_list[[iso_cc]] <- max_score_result
-  }
-
-}
-
-# Concatenar todos os data frames da lista all_main_results
-all_adducts_df <- do.call(rbind, all_adducts_list)
-
-# Filtrar adductmz com adducthyp diferentes e selecionar o maior intensity
-final_adducts_df <- all_adducts_df %>%
-  dplyr::group_by(adductmz) %>%
-  dplyr::filter(intensity == max(intensity)) %>%
-  dplyr::ungroup()
-
-final_adducts_df$sample <- samples.info$sample[file]
-
-cat('\n\n### Adducts ', '\n\n')
-
-print_paged_df(final_adducts_df)
     
+    # Concatenar todos os data frames da lista all_main_results
+    all_adducts_df <- do.call(rbind, all_adducts_list)
+    
+    # Filtrar adductmz com adducthyp diferentes e selecionar o maior intensity
+    final_adducts_df <- all_adducts_df %>%
+      dplyr::group_by(adductmz) %>%
+      dplyr::filter(intensity == max(intensity)) %>%
+      dplyr::ungroup()
+    
+    final_adducts_df$sample <- samples.info$sample[file]
+    
+    cat('\n\n### Adducts ', '\n\n')
+    print_paged_df(final_adducts_df)
+    
+    write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+    ':   Final: ', nrow(final_adducts_df), " adducts"),file=log.file,append=TRUE)
+    
+  }      
+    
+        
 ################### --------->>>>>
     
     comSpec <- MSnbase::combineSpectra(ChromPeaks.data,
@@ -456,7 +474,7 @@ processed.sps <- Spectra::Spectra(paste0(output.folder,merged.status.files$repli
 
 
 
-############### teste #################################
+############### -------->>> #################################
 processed.sps <- Spectra::setBackend(processed.sps, Spectra::MsBackendMemory() )
 
 

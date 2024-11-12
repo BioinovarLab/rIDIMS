@@ -56,7 +56,7 @@ ui <-
                                                   checkboxInput("input.replicates", "Make 3 replicates / sample", value=FALSE),
                                                   textInput("input.ppm", "ppm for grouping of mass peaks (low.res)","200"),
                                                   textInput("input.Tresh.RA", "Filter spectrum intensity by x% of maximum value","0.1"),
-                                                  checkboxInput("input.replicate.filter", "Filter replicate", value=TRUE),
+                                                  checkboxInput("input.replicate.filter", "Filter replicate", value=FALSE),
                                                   textInput("input.value.replicate.filter", "Filter replicate threshold (%)","60"),
                                                   textInput("input.subtract.group", "Subtract from the data matrix (blank/background ions class)","blank"),
                                                   textInput("input.min.fold", "Minimum fold change","3"),
@@ -119,6 +119,7 @@ server <- function(input, output,session) {
 
   shinyjs::hide(id = "input.isotopes.adducts");
   shinyjs::hide(id = "input.ion.mode");
+  shinyjs::hide(id = "input.value.replicate.filter");
 
   session.vars <- reactiveValues(data.folder = NULL,
                                  output.folder = NULL,
@@ -139,10 +140,10 @@ server <- function(input, output,session) {
   observeEvent(input$input.replicate.filter, {
 
     if((input$input.replicate.filter=="FALSE")) {
-      shinyjs::hide(id = "input.ion.mode");
+      shinyjs::hide(id = "input.value.replicate.filter");
     }
     if((input$input.replicate.filter=="TRUE")) {
-      shinyjs::show(id = "input.ion.mode");
+      shinyjs::show(id = "input.value.replicate.filter");
     }
 
 
