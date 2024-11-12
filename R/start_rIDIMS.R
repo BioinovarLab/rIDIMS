@@ -21,6 +21,7 @@
 #' @importFrom utils packageVersion
 #' @importFrom tidyr gather
 #' @importFrom stats aggregate
+#' @importFrom InterpretMSSpectrum findMAIN summary
 #'
 
 
@@ -67,9 +68,14 @@ ui <-
                                                                 "Do not filter samples" = "no.sample.filter")),
                                                   textInput("input.class.mean.filter", "Filter threshold (%)","80"),
 
-
                                                   textInput("input.n.cores", "Number of cores",n.cores),
-                                                  checkboxInput("input.make.heatmaps", "Make Heatmaps", value=FALSE)
+                                                  checkboxInput("input.make.heatmaps", "Make Heatmaps", value=FALSE),
+
+                                                  checkboxInput("input.isotopes.adducts", "Grouping of Isotopes and Adducts", value=FALSE),
+                                                  selectInput("input.ion.mode", "Ion mode",selectize = F,
+                                                              c("Positive" = "input.ion.mode.positive",
+                                                                "Negative" = "input.ion.mode.negative"))
+
                                      ),
                                      mainPanel(
                                        fluidRow(
@@ -111,6 +117,9 @@ clean.path <- function(path) {
 
 server <- function(input, output,session) {
 
+  shinyjs::hide(id = "input.isotopes.adducts");
+  shinyjs::hide(id = "input.ion.mode");
+
   session.vars <- reactiveValues(data.folder = NULL,
                                  output.folder = NULL,
                                  samples.info=NULL)
@@ -130,22 +139,34 @@ server <- function(input, output,session) {
   observeEvent(input$input.replicate.filter, {
 
     if((input$input.replicate.filter=="FALSE")) {
-      shinyjs::hide(id = "input.value.replicate.filter");
+      shinyjs::hide(id = "input.ion.mode");
     }
     if((input$input.replicate.filter=="TRUE")) {
-      shinyjs::show(id = "input.value.replicate.filter");
+      shinyjs::show(id = "input.ion.mode");
     }
 
 
   }, ignoreInit = TRUE, ignoreNULL = FALSE) #end
 
+  #input.isotopes.adducts
+  observeEvent(input$input.isotopes.adducts, {
+
+    if((input$input.isotopes.adducts=="FALSE")) {
+      shinyjs::hide(id = "input.ion.mode");
+    }
+    if((input$input.isotopes.adducts=="TRUE")) {
+      shinyjs::show(id = "input.ion.mode");
+    }
+
+
+  }, ignoreInit = TRUE, ignoreNULL = FALSE) #end
 
   #input.msresolution
   observeEvent(input$input.msresolution, {
     if((input$input.msresolution=="low.res")) {
       #shinyjs::hide(id = "input.scales");
       #shinyjs::hide(id = "input.peakThr");
-      #shinyjs::hide(id = "input.ampTh");
+      shinyjs::hide(id = "input.isotopes.adducts");
       updateTextInput(session, "input.ppm",  label = "ppm for grouping of mass peaks (low.res)", value = "200")
       updateTextInput(session, "input.binSize",  label = "binSize (Dalton)", value = "1")
       #shinyjs::show(id = "input.binSize");
@@ -155,7 +176,7 @@ server <- function(input, output,session) {
     if((input$input.msresolution=="high.res")) {
       #shinyjs::show(id = "input.scales");
       #shinyjs::show(id = "input.peakThr");
-      #shinyjs::show(id = "input.ampTh");
+      shinyjs::show(id = "input.isotopes.adducts");
       updateTextInput(session, "input.ppm",  label = "ppm for grouping of mass peaks (high.res)", value = "10")
       updateTextInput(session, "input.binSize",  label = "binSize (Dalton)", value = "0.00001")
       #shinyjs::hide(id = "input.binSize");
@@ -314,6 +335,10 @@ server <- function(input, output,session) {
     input.replicate.filter <- as.character(input$input.replicate.filter)
     input.value.replicate.filter <- as.numeric(input$input.value.replicate.filter)
     input.make.heatmaps <- as.character(input$input.make.heatmaps)
+
+    input.isotopes.adducts <- as.character(input$input.isotopes.adducts)
+    input.ion.mode <- as.character(input$input.ion.mode)
+
     report.serial <- format(Sys.time(), "%Y_%m_%d_%H_%M_%S")
 
 
@@ -339,6 +364,9 @@ server <- function(input, output,session) {
                input.value.replicate.filter,
                input.make.heatmaps,
                report.serial,
+               input.isotopes.adducts,
+               input.ion.mode,
+
                file=paste0(data.folder,"variables_step_1.Rda"))
     }
 
@@ -401,6 +429,7 @@ server <- function(input, output,session) {
       ReportSerial = report.serial,
       debug_app = debug_app,
       QC_app = QC_app,
+      ion_mode = input.ion.mode,
       PackageVersion = packageVersion("rIDIMS"),
       Data.folder=data.folder,
       Output.folder=output.folder)))

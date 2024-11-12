@@ -8,6 +8,8 @@ output:
 ---
 
 ```{r setup, include=FALSE,echo=FALSE}
+trunc <- function(x, ..., prec = 0) base::trunc(x * 10^prec, ...) / 10^prec;
+
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE) 
 set.seed(12345)
 print_paged_df <- function(...) {
@@ -131,12 +133,6 @@ for (file in 1:nrow(samples.info) ) {
     ChromPeaks.data <- xcms::findChromPeaks(xcms.data, param=mfp)
   }
 
-  #make replicates and/or combine:
-    if (make.replicates == "TRUE"){
-      message(" making replicates ... ")
-      write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
-       ':   Make replicates'),file=log.file,append=TRUE)
-    
     if (debug_app==TRUE){
       save(ChromPeaks.data,
          aggregationFun,percent.limit,
@@ -144,7 +140,7 @@ for (file in 1:nrow(samples.info) ) {
          file=paste0(data.folder, "variables_step_inside.Rda") 
      )
     }
-
+  
 
       
       chrom.data <- xcms::chromatogram(ChromPeaks.data, aggregationFun = aggregationFun)
@@ -199,6 +195,14 @@ for (file in 1:nrow(samples.info) ) {
         ggplot2::theme_bw() 
       print(p1)
 
+      
+        #make replicates and/or combine:
+    if (make.replicates == "TRUE"){
+      message(" making replicates ... ")
+      write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+       ':   Make replicates'),file=log.file,append=TRUE)
+    
+      
       temp.chrom.data$cluster <- anticlust::anticlustering(
         temp.chrom.data, 
         K = 3)
@@ -237,9 +241,82 @@ for (file in 1:nrow(samples.info) ) {
       #no replicates:
       write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
       ':   No replicates'),file=log.file,append=TRUE)
+      
+      chrom.data.item1.df <- data.frame(cluster = 1, chrom.data.item1.df[rownames(temp.chrom.data),])
+      ChromPeaks.data <- xcms::filterAcquisitionNum(ChromPeaks.data, chrom.data.item1.df$acquisitionNum)
       Biobase::fData(ChromPeaks.data)$cluster <- 1
     }
 
+  
+    save(ChromPeaks.data,input.ppm, samples.info,
+         session.parameters,
+         status.files,
+         file=paste0(data.folder, "chrompeaks.Rda"))
+  
+    
+################### --------->>>>>
+    
+spectra_data_iso_adduct <- spectra(ChromPeaks.data)
+# Carregar o pacote necessário
+library(InterpretMSSpectrum)
+
+# Criar uma lista para armazenar os resultados de findMAIN
+all_adducts_list <- vector("list", length(spectra_data_iso_adduct))
+# Loop para processar cada espectro
+for (iso_cc in seq_along(spectra_data_iso_adduct)[1:4]  ) {
+  # Extrair o espectro atual
+  current_spectrum <- spectra_data_iso_adduct[[iso_cc]]
+  
+  # Extrair os valores de m/z e intensidade do espectro atual
+  mz_values <- mz(current_spectrum)
+  intensity_values <- intensity(current_spectrum)
+  
+  # Criar um data frame para o espectro atual
+  current_spectra_df <- data.frame(
+    mz = mz_values,
+    intensity = intensity_values
+  )
+  
+  # Usar a função findMAIN() para analisar o espectro
+  main_result <- summary(findMAIN(spec = current_spectra_df))
+  #colnames:  [1] "adductmz"          "adducthyp"         "neutral_mass"      "adducts_explained" "medppm"            "int_perc"      #[7] "mass_score"        "int_score"         "supp_isos"         "total_score" 
+
+   # Filtrar resultados não nulos de adducthyp
+  filtered_result <- main_result[!is.na(main_result$adducthyp ), ]
+    # Selecionar o máximo total_score
+  if (nrow(filtered_result) > 0) {
+    max_score_result <- filtered_result[which.max(filtered_result$total_score), ]
+    max_score_result$intensity <- 0
+    for (adduct_cc in 1:nrow(max_score_result)  ) {
+      adduct_mz = max_score_result$adductmz[adduct_cc]
+      adduct_mz_find = which( round(current_spectra_df$mz, 4) == adduct_mz)
+      adduct_mz_find = adduct_mz_find[1]
+      adduct_mz_int = current_spectra_df$intensity[adduct_mz_find]
+      max_score_result$intensity[adduct_cc] <- adduct_mz_int
+    }
+  # Armazenar o resultado
+  all_adducts_list[[iso_cc]] <- max_score_result
+  }
+
+}
+
+# Concatenar todos os data frames da lista all_main_results
+all_adducts_df <- do.call(rbind, all_adducts_list)
+
+# Filtrar adductmz com adducthyp diferentes e selecionar o maior intensity
+final_adducts_df <- all_adducts_df %>%
+  dplyr::group_by(adductmz) %>%
+  dplyr::filter(intensity == max(intensity)) %>%
+  dplyr::ungroup()
+
+final_adducts_df$sample <- samples.info$sample[file]
+
+cat('\n\n### Adducts ', '\n\n')
+
+print_paged_df(final_adducts_df)
+    
+################### --------->>>>>
+    
     comSpec <- MSnbase::combineSpectra(ChromPeaks.data,
                                 ppm = input.ppm,
                                 #intensityFun = median, mzFun = median,
@@ -376,6 +453,13 @@ write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
 
 BiocParallel::register(BiocParallel::SerialParam())
 processed.sps <- Spectra::Spectra(paste0(output.folder,merged.status.files$replicate.file), backend = Spectra::MsBackendMzR())
+
+
+
+############### teste #################################
+processed.sps <- Spectra::setBackend(processed.sps, Spectra::MsBackendMemory() )
+
+
 
 write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
       ': Binning'),file=log.file,append=TRUE)
@@ -1213,6 +1297,7 @@ write(paste0( "Class filter value = " , as.character(session.parameters[12,1]) )
 write(paste0( "Replicate filter = " , as.character(session.parameters[13,1]) ),file=log.file,append=TRUE)
 write(paste0( "Replicate filter value = " , as.character(session.parameters[14,1]) ),file=log.file,append=TRUE)
 write(paste0( "Make heatmaps = " , as.character(session.parameters[15,1]) ),file=log.file,append=TRUE)
+write(paste0( "Ion mode = " , as.character(session.parameters[15,1]) ),file=log.file,append=TRUE)
 write(paste0( "Report code = " , as.character(session.parameters[16,1]) ),file=log.file,append=TRUE)
 write(paste0( "Data folder = " , as.character(session.parameters[20,1]) ),file=log.file,append=TRUE)
 
