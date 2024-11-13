@@ -29,7 +29,10 @@
 start_rIDIMS <- function() {
 debug_app=FALSE
 QC_app=FALSE
-n.cores <- parallel::detectCores() -2
+n.cores <- floor(parallel::detectCores()*0.65)
+if (n.cores ==0){
+  n.cores=1
+}
 
 check.all.numeric <- function(vector){
   stringr::str_detect(vector,"^[:digit:]+$")
@@ -73,8 +76,8 @@ ui <-
 
                                                   checkboxInput("input.isotopes.adducts", "Grouping of Isotopes and Adducts", value=FALSE),
                                                   selectInput("input.ion.mode", "Ion mode",selectize = F,
-                                                              c("Positive" = "input.ion.mode.positive",
-                                                                "Negative" = "input.ion.mode.negative"))
+                                                              c("Positive" = "positive",
+                                                                "Negative" = "negative"))
 
                                      ),
                                      mainPanel(

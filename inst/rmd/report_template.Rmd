@@ -27,6 +27,7 @@ aggregationFun <- input.aggregationFun
 percent.limit <- input.chr.limit
 Tresh.RA <- input.Tresh.RA
 script.error <- FALSE
+                                            
 
 cores <- c('#000000', '#FFC800', '#0077C8', '#F56A00', '#9B59B6', '#A3A3A3', '#00BFFF', '#F5D800', '#7F8C8D', '#7CFC00', '#EE82EE', '#00CED1', '#FF4500', '#DA70D6', '#FFA500', '#008080', '#1E90FF', '#8B008B', '#808000', '#FF69B4', '#8A2BE2', '#D2691E', '#FFD700', '#800080', '#008000', '#DC143C', '#4169E1', '#00FF7F', '#FF1493', '#FF00FF')
 
@@ -82,6 +83,7 @@ if (make.replicates == "TRUE"){
 }
 
 status.files <- data.frame()
+samples_adducts_list <- vector("list",  nrow(samples.info) )
 
 for (file in 1:nrow(samples.info) ) {
   
@@ -259,18 +261,24 @@ for (file in 1:nrow(samples.info) ) {
   if (input.isotopes.adducts == TRUE){
     
     write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
-    ':   Grouping of Isotopes and Adducts'),file=log.file,append=TRUE)
+    ':   Grouping of Isotopes and Adducts. Ion mode = ', input.ion.mode),file=log.file,append=TRUE)
   
-    spectra_data_iso_adduct <- xcms::spectra(ChromPeaks.data)
-
+    #spectra_data_iso_adduct <- xcms::spectra(ChromPeaks.data)
+    ChromPeaks.data.ntotal = length(ChromPeaks.data)
     # Criar uma lista para armazenar os resultados de findMAIN
-    all_adducts_list <- vector("list", length(spectra_data_iso_adduct))
+    all_adducts_list <- vector("list",  ChromPeaks.data.ntotal)
     # Loop para processar cada espectro
-    for (iso_cc in seq_along(spectra_data_iso_adduct) ) {
+    for (iso_cc in 1:ChromPeaks.data.ntotal ) {
+      #print(iso_cc)
       
+      iso_cc_scan = ChromPeaks.data[iso_cc]
+      iso_cc_scan = MSnbase::removePeaks(iso_cc_scan, 
+                                         t=max(intensity(iso_cc_scan[1])[[1]]) * (input.Tresh.RA / 100))
+      iso_cc_scan <- MSnbase::clean(iso_cc_scan, all=TRUE)
+
       # Imprimir progresso em blocos de 10%
-      if (iso_cc %% ceiling(length(spectra_data_iso_adduct) / 10) == 0) {
-        progresso_cc_str <- round(iso_cc / length(spectra_data_iso_adduct),2)*100
+      if (iso_cc %% ceiling(ChromPeaks.data.ntotal / 10) == 0) {
+        progresso_cc_str <- round(iso_cc / ChromPeaks.data.ntotal,2)*100
         
         write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
         ':   Grouping: ', progresso_cc_str, "%"),file=log.file,append=TRUE)
@@ -278,11 +286,11 @@ for (file in 1:nrow(samples.info) ) {
       }
       
       # Extrair o espectro atual
-      current_spectrum <- spectra_data_iso_adduct[[iso_cc]]
+      current_spectrum <- xcms::spectra(iso_cc_scan)
       
       # Extrair os valores de m/z e intensidade do espectro atual
-      mz_values <- mz(current_spectrum)
-      intensity_values <- intensity(current_spectrum)
+      mz_values <- MSnbase::mz(iso_cc_scan)[1][[1]]
+      intensity_values <- MSnbase::intensity(iso_cc_scan)[1][[1]]
       
       # Criar um data frame para o espectro atual
       current_spectra_df <- data.frame(
@@ -291,14 +299,15 @@ for (file in 1:nrow(samples.info) ) {
       )
       
       # Usar a função findMAIN() para analisar o espectro
-      main_result <- summary(InterpretMSSpectrum::findMAIN(spec = current_spectra_df))
+      main_result <- summary(InterpretMSSpectrum::findMAIN(spec = current_spectra_df,ionmode = input.ion.mode,
+                                                           mzabs = input.binSize, ppm = input.ppm))
       #colnames:  [1] "adductmz"          "adducthyp"         "neutral_mass"      "adducts_explained" "medppm"                   "int_perc"      #[7] "mass_score"        "int_score"         "supp_isos"         "total_score" 
     
        # Filtrar resultados não nulos de adducthyp
       filtered_result <- main_result[!is.na(main_result$adducthyp ), ]
         # Selecionar o máximo total_score
       if (nrow(filtered_result) > 0) {
-        max_score_result <- filtered_result[which.max(filtered_result$total_score), ]
+        max_score_result <- filtered_result[which(filtered_result$total_score==max(filtered_result$total_score)), ]
         max_score_result$intensity <- 0
         for (adduct_cc in 1:nrow(max_score_result)  ) {
           adduct_mz = max_score_result$adductmz[adduct_cc]
@@ -324,6 +333,8 @@ for (file in 1:nrow(samples.info) ) {
     
     final_adducts_df$sample <- samples.info$sample[file]
     
+    samples_adducts_list[[file]] <- final_adducts_df
+    
     cat('\n\n### Adducts ', '\n\n')
     print_paged_df(final_adducts_df)
     
@@ -332,7 +343,9 @@ for (file in 1:nrow(samples.info) ) {
     
   }      
     
-        
+    save(ChromPeaks.data,
+         file=paste0(data.folder, "chrompeaks_",file,"_.Rda"))
+     
 ################### --------->>>>>
     
     comSpec <- MSnbase::combineSpectra(ChromPeaks.data,
@@ -448,17 +461,37 @@ if ( script.error == TRUE | n.error.files == nrow(status.files) ) {
 
 ```{r, echo=FALSE,warning=FALSE,message=FALSE,fig.pos='H',fig.align='center',out.width='100%',fig.height=5,fig.width=9, results='asis'}
 
+if (input.isotopes.adducts == TRUE){
+    
+  samples_adducts_list_combined <- do.call(rbind, samples_adducts_list)
+  samples_adducts_list_consensus <-  samples_adducts_list_combined %>%
+                                      group_by(adductmz) %>%
+                                      arrange(desc(intensity), desc(total_score), medppm) %>%
+                                      slice(1) %>% 
+                                      ungroup()
+  
+  write.table(x = samples_adducts_list_consensus,
+                file = paste0(data.folder, "Samples_adducts.csv"), sep=",", row.names=FALSE, quote = F)
+  
+}
+
 #################
 ################# Process - step 2
 #################
 
 set.seed(12345)
 
-    
+        save(data.folder,
+             samples.info,input.binSize,
+             status.files,samples_adducts_list,output.folder,
+             merged.status.files,
+             file=paste0(data.folder, "variables_step_2.Rda") 
+         )
+
   if (debug_app==TRUE){
         save(data.folder,
-             samples.info,
-             status.files,
+             samples.info,input.binSize,
+             status.files,samples_adducts_list,output.folder,
              merged.status.files,
              file=paste0(data.folder, "variables_step_2.Rda") 
          )
@@ -470,12 +503,14 @@ write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
 ': Second step'),file=log.file,append=TRUE)
 
 BiocParallel::register(BiocParallel::SerialParam())
-processed.sps <- Spectra::Spectra(paste0(output.folder,merged.status.files$replicate.file), backend = Spectra::MsBackendMzR())
+processed.sps <- Spectra::Spectra(paste0(output.folder,
+                                         merged.status.files$replicate.file), 
+                                  backend = Spectra::MsBackendMzR())
 
 
 
 ############### -------->>> #################################
-processed.sps <- Spectra::setBackend(processed.sps, Spectra::MsBackendMemory() )
+##processed.sps <- Spectra::setBackend(processed.sps, Spectra::MsBackendMemory() )
 
 
 
@@ -601,6 +636,10 @@ cat('\n\n File exported to: ', paste0(data.folder, "Data","_metaboanalyst.csv") 
 
 names(cores)[1:length(unique(df.export$class))] <- unique(df.export$class)
 
+### verifica numero de samples
+
+if (nrow(samples.info) >= 2){
+
 #---------- pca
 cat('\n\n## PCA (raw data) \n\n') 
 cat('\n\n  PCA of the dataset after scan selection and alignment. All inputed classes were included in the analysis. Note that the PCA analysis was performed for data visualization purposes only, no normalization algorithm was executed prior to the analysis.  \n\n') 
@@ -622,6 +661,8 @@ plot.pca <- ggplot2::ggplot(scores, aes(x = PC1, y = PC2, color = class)) +
 print(plot.pca)
 
 #----------- end of pca
+}
+
 
 #----------- mean of data
 
@@ -1191,8 +1232,6 @@ if (ncol(df.export)==2){
 ```{r, echo=FALSE,warning=FALSE,message=FALSE,fig.pos='H',fig.align='center',out.width='100%',fig.height=5,fig.width=9, results='asis'}
 
 
-
-
 if ( n.total.classes > 0 ){
 
   if (ncol(df.export) > 3){
@@ -1211,17 +1250,16 @@ if ( n.total.classes > 0 ){
       heatmap(as.matrix(class.filtered.hm), labRow=df.export$class)
     }
 
+if (nrow(samples.info) >= 2){
+    
     #---------- pca
     cat('\n\n## PCA (processed) \n\n') 
     cat('\n\n  PCA of the dataset after processing. Note that the PCA analysis was performed for data visualization purposes only, no normalization algorithm was executed prior to the analysis. \n\n') 
-    
     pca <- prcomp(class.filtered.hm, scale = TRUE)
     scores <- as.data.frame(pca$x)
     scores$class <- df.export$class
-    
     pca.pecents <- pca$sdev^2/sum(pca$sdev^2)*100
     pca.pecents.df <- data.frame(PC = paste0("PC", 1:length(pca.pecents)), Porcentagem = pca.pecents)
-    
     plot.pca <- ggplot2::ggplot(scores, aes(x = PC1, y = PC2, color = class)) +
     ggplot2::geom_point(size = 3) +
     scale_color_manual(values = cores ) +
@@ -1231,7 +1269,8 @@ if ( n.total.classes > 0 ){
     ggplot2::theme_bw()
     print(plot.pca)
     #----------- end of pca
-
+}
+    
     df.export.mean <- df.export %>% 
                       dplyr::group_by(class) %>%
                       dplyr::summarise(dplyr::across(tidyselect::where(is.numeric),base::mean))
@@ -1289,6 +1328,19 @@ if ( n.total.classes > 0 ){
 
   #din <- data.table::fread(file="C:/Users/Planck/Documents/MTBLS117/Data_metaboanalyst_class_filtered_80.csv", header = T)
 
+}
+
+```
+
+
+
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE,fig.pos='H',fig.align='center',out.width='100%',fig.height=5,fig.width=9, results='asis'}
+
+if (input.isotopes.adducts == TRUE){
+ 
+  
+   
 }
 
 ```
