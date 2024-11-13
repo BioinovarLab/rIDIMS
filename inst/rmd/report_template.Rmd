@@ -10,6 +10,54 @@ output:
 ```{r setup, include=FALSE,echo=FALSE}
 trunc <- function(x, ..., prec = 0) base::trunc(x * 10^prec, ...) / 10^prec;
 
+
+mapear_sample_mz_adductmz <- function(sample_mz, adduct_df, tol = 0.001) {
+
+  result_df <- data.frame(sample_mz = numeric(), corresponding_adductmz = numeric())
+
+  for (i in 1:length(sample_mz)) {
+    mz_target <- as.numeric(sample_mz[i])
+
+    adduct_match <- which(abs(adduct_df$adductmz - mz_target) <= tol)
+
+    if (length(adduct_match) > 0) {
+      corresponding_adductmz <- adduct_df$adductmz[adduct_match[1]]
+      result_df <- rbind(result_df, data.frame(sample_mz = mz_target, corresponding_adductmz = corresponding_adductmz))
+    } else {
+      result_df <- rbind(result_df, data.frame(sample_mz = mz_target, corresponding_adductmz = NA))
+    }
+  }
+  
+  return(result_df)
+}
+
+agrupar_sample_mz <- function(samples_df, mapping_df) {
+
+  unique_adducts <- unique(mapping_df$corresponding_adductmz[!is.na(mapping_df$corresponding_adductmz)])
+
+  new_adducts_df <- samples_df[, c("samples", "class"), drop = FALSE]
+  
+  for (adduct in unique_adducts) {
+    sample_mz_subset <- mapping_df$sample_mz[mapping_df$corresponding_adductmz == adduct]
+    sample_mz_subset <- as.character(na.omit(sample_mz_subset))
+
+    valid_columns <- sample_mz_subset[sample_mz_subset %in% colnames(samples_df)]
+
+    if (length(valid_columns) == 0) {
+      next
+    }
+
+    subset_samples <- samples_df[, valid_columns, drop = FALSE]
+
+    max_intensities <- apply(subset_samples, 1, max, na.rm = TRUE)
+
+    new_adducts_df[[as.character(adduct)]] <- max_intensities
+  }
+  
+  return(new_adducts_df)
+}
+
+
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE) 
 set.seed(12345)
 print_paged_df <- function(...) {
@@ -124,8 +172,8 @@ for (file in 1:nrow(samples.info) ) {
   
   if (input.msresolution=="high.res"){
     #vector.input.scales <- base::strsplit(input.scales,",")[[1]]
-    #mfp <- xcms::MatchedFilterParam(binSize = 0.01)
-    mfp <- xcms::MatchedFilterParam(binSize = input.binSize)
+    mfp <- xcms::MatchedFilterParam(binSize = 0.1)
+    #mfp <- xcms::MatchedFilterParam(binSize = input.binSize)
 
     xcms::snthresh(mfp) <- input.snthresh
     ChromPeaks.data <- xcms::findChromPeaks(xcms.data, param=mfp)
@@ -258,7 +306,9 @@ for (file in 1:nrow(samples.info) ) {
     
 ################### --------->>>>>
 
-  if (input.isotopes.adducts == TRUE){
+  if (input.isotopes.adducts == TRUE & samples.info$class[file] != input.subtract.group){
+    
+    
     
     write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
     ':   Grouping of Isotopes and Adducts. Ion mode = ', input.ion.mode),file=log.file,append=TRUE)
@@ -465,10 +515,10 @@ if (input.isotopes.adducts == TRUE){
     
   samples_adducts_list_combined <- do.call(rbind, samples_adducts_list)
   samples_adducts_list_consensus <-  samples_adducts_list_combined %>%
-                                      group_by(adductmz) %>%
-                                      arrange(desc(intensity), desc(total_score), medppm) %>%
-                                      slice(1) %>% 
-                                      ungroup()
+                                      dplyr::group_by(adductmz) %>%
+                                      dplyr::arrange(dplyr::desc(intensity), dplyr::desc(total_score), medppm) %>%
+                                      dplyr::slice(1) %>% 
+                                      dplyr::ungroup()
   
   write.table(x = samples_adducts_list_consensus,
                 file = paste0(data.folder, "Samples_adducts.csv"), sep=",", row.names=FALSE, quote = F)
@@ -1339,8 +1389,22 @@ if (nrow(samples.info) >= 2){
 
 if (input.isotopes.adducts == TRUE){
  
+     save(df.export,samples_adducts_list,samples_adducts_list_consensus,
+          merged.status.files,
+          file=paste0(data.folder, "variables_debug.Rda") 
+     )
   
-   
+sample_mz <- colnames(df.export)[3:ncol(df.export)]
+resultado_mapping <- mapear_sample_mz_adductmz(sample_mz, samples_adducts_list_consensus) %>% as.data.frame()
+
+write.table(resultado_mapping,
+             file=paste0(data.folder, "Adducts_map", ".csv"),  sep=",",row.names = F)
+
+df_cluster_adducts <- agrupar_sample_mz(df.export, resultado_mapping)
+write.table(x = df_cluster_adducts,
+            file = paste0(data.folder,"Data","_metaboanalyst_samples_adduct_filtered.csv"),
+            sep=",", row.names=FALSE, quote = F)
+  
 }
 
 ```
