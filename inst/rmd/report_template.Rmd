@@ -11,20 +11,23 @@ output:
 trunc <- function(x, ..., prec = 0) base::trunc(x * 10^prec, ...) / 10^prec;
 
 
-mapear_sample_mz_adductmz <- function(sample_mz, adduct_df, tol = 0.001) {
+mapear_sample_mz_adductmz <- function(sample_mz, adduct_df, tol = input.binSize) {
 
-  result_df <- data.frame(sample_mz = numeric(), corresponding_adductmz = numeric())
+  result_df <- data.frame(sample_mz = numeric(), corresponding_adductmz = numeric(), adduct = character())
 
   for (i in 1:length(sample_mz)) {
     mz_target <- as.numeric(sample_mz[i])
 
-    adduct_match <- which(abs(adduct_df$adductmz - mz_target) <= tol)
+    adduct_match <- which(abs(adduct_df$mz - mz_target) <= tol)
 
     if (length(adduct_match) > 0) {
-      corresponding_adductmz <- adduct_df$adductmz[adduct_match[1]]
-      result_df <- rbind(result_df, data.frame(sample_mz = mz_target, corresponding_adductmz = corresponding_adductmz))
+      corresponding_adductmz <- adduct_df$mz[adduct_match[1]]
+      corresponding_adductlabel <- adduct_df$adduct[adduct_match[1]]
+      result_df <- rbind(result_df, data.frame(sample_mz = mz_target, 
+                                               corresponding_adductmz = corresponding_adductmz,
+                                               adduct = corresponding_adductlabel))
     } else {
-      result_df <- rbind(result_df, data.frame(sample_mz = mz_target, corresponding_adductmz = NA))
+      result_df <- rbind(result_df, data.frame(sample_mz = mz_target, corresponding_adductmz = NA,adduct=NA))
     }
   }
   
@@ -57,6 +60,81 @@ agrupar_sample_mz <- function(samples_df, mapping_df) {
   return(new_adducts_df)
 }
 
+if ( input.ion.mode=="positive"  ) {
+  ads <- c("[M+H]+", "[M+Na]+", "[M+K]+", "[M+NH4]+", 
+           "[2M+H]+", "[2M+Na]+", "[2M+K]+", "[2M+NH4]+")
+  nls <- c("[M+H-COCH2]+", "[M+H-C2H3NO]+", "[M+H-H2O]+", 
+           "[M+H-NH3]+", "[M+H-CO2]+", "[M+H-NH3-CO2]+", 
+           "[M+H-NH3-HCOOH]+", "[M+H-NH3-H2O]+", "[M+H-NH3-COCH2]+", 
+           "[M+H-S]+", "[M+H-S-NH3-HCOOH]+", "[M+H-H4O2]+", 
+           "[M+H-CH2]+", "[M+H-CH4O3]+", "[M+H-O]+", "[M+H-C2H2]+", 
+           "[M+H-C2H4]+", "[M+H-CO]+", "[M+H-C3H6]+", "[M+H-C2H4O]+", 
+           "[M+H-C4H6]+", "[M+H-C3H4O]+", "[M+H-C4H8]+", 
+           "[M+H-C5H8]+", "[M+H-C4H6O]+", "[M+H-C5H10]+", 
+           "[M+H-C6H12]+", "[M+H-C4H8O2]+", "[M+H-H2O-HCOOH]+", 
+           "[M+H-CH4]+", "[M+H-CH2O]+", "[M+H-C2H6]+", 
+           "[M+H-CH3OH]+", "[M+H-C3H4]+", "[M+H-C3H6O]+", 
+           "[M+H-CO2-C3H6]+", "[M+H-SO3]+", "[M+H-SO3-H2O]+", 
+           "[M+H-SO3-H2O-NH3]+", "[M+H-NH3-C3H4]+", "[M+H-H2O-CO2]+", 
+           "[M+H-H2O-H2O-C2H4O]+", "[M+H-NH3-CO-CO]+", 
+           "[M+H-NH3-CO-C2OH2]+", "[M+H-C8H6O]+", "[M+H-C8H6O-NH3]+", 
+           "[M+H-C8H6O-H2O]+", "[M+H-C2H2O2]+", "[M+H-C2H4O2]+", 
+           "[M+H-C5H8O]+", "[M+H-NH3-CO2-CH2O]+", "[M+H-N2H6-CO2-H2O]+", 
+           "[M+H-NH3-CO2-C3H4O]+", "[M+H-NH3-CO2-C5H8]+", 
+           "[M+H-C2O4H4]+", "[M+H-C2H4-CO2]+", "[M+H-C2H4-HCOOH]+", 
+           "[M+H-NH3-H4O2]+", "[M+H-H2O-C2H2O2]+", "[M+H-COCH2-C4H8]+", 
+           "[M+H-NH3-NH3-C3H4]+", "[M+H-C2H4O2-CH3OH]+", 
+           "[M+H-C3H6O-CH3OH]+", "[M+H-NH3-CO-COCH2-C4H6O]+", 
+           "[M+H-C4H6-H2O]+", "[M+H-C4H6-C2H4]+", "[M+H-C4H6-NH3-H2O]+", 
+           "[M+H-C4H6-COCH2]+", "[M+H-C8H12O]+", "[M+H-C3H4O-C4H6]+", 
+           "[M+H-C3H4O-C4H8O2]+", "[M+H-C4H8-C4H6]+", "[M+H-NH3-HCOOH-CH3OH]+", 
+           "[M+H-NH3-C2H6]+", "[M+H-NH3-C8H6O-CH2]+", "[M+H-NH3-C3H4-COCH2]+", 
+           "[M+H-C3H9N]+", "[M+H-C3H9N-C2H4O2]+", "[M+H-C6H10O7]+", 
+           "[M+H-C6H10O7+H2O]+", "[M+H-C6H10O7-H4O2]+", 
+           "[M+H-C6H12O6]+", "[M+H-C6H12O6+H2O]+", "[M+H-C6H12O6-H2O]+", 
+           "[M+H-C5H10O5]+", "[M+H- C5H10O5+H2O]+", "[M+H- C5H10O5-H2O]+", 
+           "[M+H-C2H8NO4P]+", "[M+H-H6O3-CO]+", "[M+H-C6H13NO2]+", 
+           "[M+H-C5H11NO2]+", "[M+H-CH3S]+", "[M+H-C8H8O2]+", 
+           "[M+H-C12H22O11]+", "[M+H-C12H24O12]+", "[M+H-C12H20O10]+")
+}
+if ( input.ion.mode=="negative"  ) {
+  ads <- c("[M-H]-", "[M+Na-2H]-", "[M+K-2H]-", "[M+CH2O2-H]-", 
+           "[2M-H]-", "[2M+Na-2H]-", "[2M+K-2H]-", "[2M+CH2O2- H]-",
+           "[3M-H]-", "[3M+Na-2H]-", "[3M+K-2H]-", "[3M+CH2O2- H]-")
+  nls <- c("[M-H-NH3]-", "[M-H-H2O]-", "[M-H-COCH2]-", 
+           "[M-H-CO2]-", "[M-H-NH3-CO2]-", "[M-H-NH3-HCOOH]-", 
+           "[M-H-NH3-H2O]-", "[M-H-NH3-C2OH2]-", "[M-H-S]-", 
+           "[M-H-S-NH3-HCOOH]-", "[M-H-H4O2]-", "[M-H-CH2]-", 
+           "[M-H-O]-", "[M-H-C2H2]-", "[M-H-C2H4]-", "[M-H-CO]-", 
+           "[M-H-C3H6]-", "[M-H-C2H4O]-", "[M-H-C4H6]-", 
+           "[M-H-C3H4O]-", "[M-H-C4H8]-", "[M-H-C5H8]-", 
+           "[M-H-C4H6O]-", "[M-H-C5H10]-", "[M-H-C6H12]-", 
+           "[M-H-C4H8O2]-", "[M-H-H2O-HCOOH]-", "[M-H-CH4]-", 
+           "[M-H-CH2O]-", "[M-H-C2H6]-", "[M-H-CH3OH]-", 
+           "[M-H-C3H4]-", "[M-H-C3H6O]-", "[M-H-CO2-C3H6]-", 
+           "[M-H-SO3]-", "[M-H-SO3-H2O]-", "[M-H-SO3-H2O-NH3]-", 
+           "[M-H-NH3-C3H4]-", "[M-H-H2O-CO2]-", "[M-H-H2O-H2O-C2H4O]-", 
+           "[M-H-NH3-CO-CO]-", "[M-H-NH3-CO-COCH2]-", "[M-H-C8H6O]-", 
+           "[M-H-C8H6O-NH3]-", "[M-H-C8H6O-H2O]-", "[M-H-C2H2O2]-", 
+           "[M-H-C2H4O2]-", "[M-H-C5H8O]-", "[M-H-NH3-CO2-CH2O]-", 
+           "[M-H-NH3-CO2-NH3-H2O]-", "[M-H-NH3-CO2-C3H4O]-", 
+           "[M-H-NH3-CO2-C5H8]-", "[M-H-HCOOH-HCOOH]-", 
+           "[M-H-C2H4-CO2]-", "[M-H-C2H4-HCOOH]-", "[M-H-NH3-H2O-H2O]-", 
+           "[M-H-H2O-C2H2O2]-", "[M-H-C2OH2-C4H8]-", "[M-H-NH3-NH3-C3H4]-", 
+           "[M-H-C2H4O2-CH3OH]-", "[M-H-C3H6O-CH3OH]-", 
+           "[M-H-NH3-CO-COCH2-C4H6O]-", "[M-H-C4H6-H2O]-", 
+           "[M-H-C4H6-C2H4]-", "[M-H-C4H6-NH3-H2O]-", "[M-H-C4H6-COCH2]-", 
+           "[M-H-C4H6-C4H6O]-", "[M-H-C3H4O-C4H6]-", "[M-H-C3H4O-C4H8O2]-", 
+           "[M-H-C4H8-C4H6]-", "[M-H-NH3-HCOOH-CH3OH]-", 
+           "[M-H-NH3-C2H6]-", "[M-H-NH3-C8H6O-CH2]-", "[M-H-NH3-C3H4-COCH2]-", 
+           "[M-H-C3H9N]-", "[M-H-C3H9N-C2H4O2]-", "[M-H-C6H10O7]-", 
+           "[M-H-C6H10O7+H2O]-", "[M-H-C6H10O7-H4O2]-", 
+           "[M-H-C6H12O6]-", "[M-H-C6H12O6+H2O]-", "[M-H-C6H12O6-H2O]-", 
+           "[M-H-C5H10O5]-", "[M-H-C5H10O5+H2O]-", "[M-H-C5H10O5-H2O]-", 
+           "[M-H-C2H8NO4P]-", "[M-H-CH6O4]-", "[M-H-C6H13NO2]-", 
+           "[M-H-C5H11NO2]-", "[M-H-CH3S]-", "[M-H-C8H8O2]-", 
+           "[M-H-C12H22O11]-", "[M-H-C12H24O12]-", "[M-H-C12H20O10]-")
+}
 
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE) 
 set.seed(12345)
@@ -132,7 +210,21 @@ if (make.replicates == "TRUE"){
 
 status.files <- data.frame()
 samples_adducts_list <- vector("list",  nrow(samples.info) )
+#all_findMAIN_results <- list()
 
+if (input.isotopes.adducts == TRUE){
+  
+  dir_adduts <- paste0(data.folder,"Adducts_plots/" )
+
+  if (file.exists(dir_adduts)){
+    invisible( unlink(paste0(dir_adduts,"*"), recursive = TRUE, force = TRUE) )
+  }else{
+    dir.create(dir_adduts)
+  }
+}
+  
+  
+  
 for (file in 1:nrow(samples.info) ) {
   
   cat('\n\n## Working on:', samples.info$sample[file], '\n\n')
@@ -307,9 +399,7 @@ for (file in 1:nrow(samples.info) ) {
 ################### --------->>>>>
 
   if (input.isotopes.adducts == TRUE & samples.info$class[file] != input.subtract.group){
-    
-    
-    
+ 
     write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
     ':   Grouping of Isotopes and Adducts. Ion mode = ', input.ion.mode),file=log.file,append=TRUE)
   
@@ -323,7 +413,7 @@ for (file in 1:nrow(samples.info) ) {
       
       iso_cc_scan = ChromPeaks.data[iso_cc]
       iso_cc_scan = MSnbase::removePeaks(iso_cc_scan, 
-                                         t=max(intensity(iso_cc_scan[1])[[1]]) * (input.Tresh.RA / 100))
+                                         t=max(MSnbase::intensity(iso_cc_scan[1])[[1]]) * (input.Tresh.RA / 100))
       iso_cc_scan <- MSnbase::clean(iso_cc_scan, all=TRUE)
 
       # Imprimir progresso em blocos de 10%
@@ -349,52 +439,100 @@ for (file in 1:nrow(samples.info) ) {
       )
       
       # Usar a função findMAIN() para analisar o espectro
-      main_result <- summary(InterpretMSSpectrum::findMAIN(spec = current_spectra_df,ionmode = input.ion.mode,
-                                                           mzabs = input.binSize, ppm = input.ppm))
-      #colnames:  [1] "adductmz"          "adducthyp"         "neutral_mass"      "adducts_explained" "medppm"                   "int_perc"      #[7] "mass_score"        "int_score"         "supp_isos"         "total_score" 
-    
-       # Filtrar resultados não nulos de adducthyp
-      filtered_result <- main_result[!is.na(main_result$adducthyp ), ]
-        # Selecionar o máximo total_score
-      if (nrow(filtered_result) > 0) {
-        max_score_result <- filtered_result[which(filtered_result$total_score==max(filtered_result$total_score)), ]
-        max_score_result$intensity <- 0
-        for (adduct_cc in 1:nrow(max_score_result)  ) {
-          adduct_mz = max_score_result$adductmz[adduct_cc]
+      findMAIN_res <- InterpretMSSpectrum::findMAIN(spec = current_spectra_df,ionmode = input.ion.mode,
+                                                           mzabs = input.binSize, ppm = input.ppm,
+                                   rules = c(ads, nls), 
+                                   adducthyp = ads[grep("[M", ads, fixed = TRUE)],mainpkthr = 0.3, 
+                                   collapseResults = FALSE )
+
+
+      
+      findMAIN_res_summarytable <- summary(findMAIN_res)
+      #RAMClustR summaryscores https://github.com/cbroeckl/RAMClustR
+      summaryscores <- sapply(1:length(findMAIN_res), FUN = function(x) {
+          is.adduct <- which(findMAIN_res[[x]][, "adduct"] %in% ads)
+          det.adducts <- findMAIN_res[[x]][is.adduct, "adduct"]
+          is.nl <- which(findMAIN_res[[x]][, "adduct"] %in% nls)
+          keep <- is.adduct
+          int <- sum(findMAIN_res[[x]][is.adduct, "intensity"])
+          if (length(is.nl) > 0) {
+            int <- sum(int, sum(0.5 * (findMAIN_res[[x]][is.nl, "intensity"])))
+            keep <- c(keep, is.nl)
+          }
+          int <- int/sum(findMAIN_res[[x]][, "intensity"]) * length(is.adduct)
+          if (any(grepl("[M+H-NH3]+", det.adducts)) & length(det.adducts == 
+                                                             1)) {
+            int <- int/2
+          }
+          mzerr <- (1/findMAIN_res_summarytable[x, "medppm"])^0.5
+          return(int * mzerr)
+      })
+      best_findMAIN <- which.max(summaryscores)
+      if (length(best_findMAIN) == 0) {
+        best_findMAIN <- 1
+      }
+      sort_best_findMAIN <- sort(summaryscores, decreasing = TRUE)[1]/sort(summaryscores, 
+                                                     decreasing = TRUE)[2]
+      if(is.na(sort_best_findMAIN)) {sort_best_findMAIN<- 1}
+      
+      findMAIN_neutral_mass <- as.numeric(findMAIN_res_summarytable[best_findMAIN, "neutral_mass"])
+      findMAIN_best_result <- findMAIN_res[[best_findMAIN]]
+      findMAIN_best_result_noNA <- findMAIN_best_result[!is.na(findMAIN_best_result$adduct),]
+      findMAIN_best_result_noNA$neutral_mass <- findMAIN_neutral_mass
+      findMAIN_best_result_noNA$scan <- iso_cc
+
+      #save(current_spectra_df,input.ion.mode,input.binSize,input.ppm,ads, nls,iso_cc,samples.info,file,
+      #file=paste0(data.folder, "findMAIN_",file,"_",iso_cc,".Rda"))
+      
+      if (nrow(findMAIN_best_result_noNA) > 0) {
+        for (adduct_cc in 1:nrow(findMAIN_best_result_noNA)  ) {
+          adduct_mz = round(findMAIN_best_result_noNA$mz[adduct_cc] , 4) 
           adduct_mz_find = which( round(current_spectra_df$mz, 4) == adduct_mz)
           adduct_mz_find = adduct_mz_find[1]
           adduct_mz_int = current_spectra_df$intensity[adduct_mz_find]
-          max_score_result$intensity[adduct_cc] <- adduct_mz_int
+          #sample_mz_val = current_spectra_df$mz[adduct_mz_find]
+          findMAIN_best_result_noNA$raw_intensity[adduct_cc] <- adduct_mz_int
+          #findMAIN_best_result_noNA$sample_mz[adduct_cc] <- sample_mz_val
         }
-      # Armazenar o resultado
-      all_adducts_list[[iso_cc]] <- max_score_result
       }
+      findMAIN_best_result_noNA$file <- samples.info$sample[file]
+      
+      
+      png(paste0(dir_adduts,samples.info$sample[file],"_",findMAIN_neutral_mass,"_",iso_cc,".png"), width  = 3.25*2, 
+          height = 3.25, units = "in",  res  = 600, pointsize = 2.5)
+      par(cex.main=1, cex.lab=1,cex.axis=0.8,cex=2.5)
+        InterpretMSSpectrum::PlotSpec(x = findMAIN_best_result, 
+                                txt = findMAIN_best_result[, c("mz", "adduct")], 
+                                cutoff = 0, masslab = 0, 
+                                ylim = c(0,  1.5 * max(findMAIN_best_result[, 2])) )
+      dev.off()
+
+                              
+      all_adducts_list[[iso_cc]] <- findMAIN_best_result_noNA
     
     }
     
     # Concatenar todos os data frames da lista all_main_results
     all_adducts_df <- do.call(rbind, all_adducts_list)
-    
-    # Filtrar adductmz com adducthyp diferentes e selecionar o maior intensity
+
+        # Filtrar adductmz com adducthyp diferentes e selecionar o maior intensity
     final_adducts_df <- all_adducts_df %>%
-      dplyr::group_by(adductmz) %>%
-      dplyr::filter(intensity == max(intensity)) %>%
+      dplyr::group_by(mz) %>%
+      dplyr::filter(raw_intensity == max(raw_intensity)) %>%
       dplyr::ungroup()
     
-    final_adducts_df$sample <- samples.info$sample[file]
-    
     samples_adducts_list[[file]] <- final_adducts_df
-    
+
     cat('\n\n### Adducts ', '\n\n')
-    print_paged_df(final_adducts_df)
+    print_paged_df(final_adducts_df[,c("mz","adduct","neutral_mass")])
     
     write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
     ':   Final: ', nrow(final_adducts_df), " adducts"),file=log.file,append=TRUE)
     
   }      
     
-    save(ChromPeaks.data,
-         file=paste0(data.folder, "chrompeaks_",file,"_.Rda"))
+    #save(ChromPeaks.data,
+    #     file=paste0(data.folder, "chrompeaks_",file,"_.Rda"))
      
 ################### --------->>>>>
     
@@ -512,16 +650,20 @@ if ( script.error == TRUE | n.error.files == nrow(status.files) ) {
 ```{r, echo=FALSE,warning=FALSE,message=FALSE,fig.pos='H',fig.align='center',out.width='100%',fig.height=5,fig.width=9, results='asis'}
 
 if (input.isotopes.adducts == TRUE){
-    
-  samples_adducts_list_combined <- do.call(rbind, samples_adducts_list)
-  samples_adducts_list_consensus <-  samples_adducts_list_combined %>%
-                                      dplyr::group_by(adductmz) %>%
-                                      dplyr::arrange(dplyr::desc(intensity), dplyr::desc(total_score), medppm) %>%
-                                      dplyr::slice(1) %>% 
-                                      dplyr::ungroup()
+
+  #all_findMAIN_results_combined <- do.call(rbind, all_findMAIN_results)
   
-  write.table(x = samples_adducts_list_consensus,
+  samples_adducts_list_combined <- do.call(rbind, samples_adducts_list)
+
+  samples_adducts_consensus <- samples_adducts_list_combined %>%
+                                dplyr::group_by(mz) %>%
+                                dplyr::slice_max(raw_intensity, n = 1, with_ties = FALSE) %>%
+                                dplyr::ungroup()
+
+  write.table(x = samples_adducts_consensus,
                 file = paste0(data.folder, "Samples_adducts.csv"), sep=",", row.names=FALSE, quote = F)
+  #write.table(x = all_findMAIN_results_combined,
+  #              file = paste0(data.folder, "All_findMAIN_results_combined.csv"), sep=",", row.names=FALSE, quote = F)
   
 }
 
@@ -1389,13 +1531,13 @@ if (nrow(samples.info) >= 2){
 
 if (input.isotopes.adducts == TRUE){
  
-     save(df.export,samples_adducts_list,samples_adducts_list_consensus,
-          merged.status.files,
-          file=paste0(data.folder, "variables_debug.Rda") 
-     )
+save(df.export,samples_adducts_consensus,
+    merged.status.files,
+    file=paste0(data.folder, "variables_debug.Rda") 
+)
   
 sample_mz <- colnames(df.export)[3:ncol(df.export)]
-resultado_mapping <- mapear_sample_mz_adductmz(sample_mz, samples_adducts_list_consensus) %>% as.data.frame()
+resultado_mapping <- mapear_sample_mz_adductmz(sample_mz, samples_adducts_consensus) %>% as.data.frame()
 
 write.table(resultado_mapping,
              file=paste0(data.folder, "Adducts_map", ".csv"),  sep=",",row.names = F)
