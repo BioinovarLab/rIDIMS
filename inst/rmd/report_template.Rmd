@@ -441,10 +441,10 @@ for (file in 1:nrow(samples.info) ) {
       # Usar a função findMAIN() para analisar o espectro
       findMAIN_res <- InterpretMSSpectrum::findMAIN(spec = current_spectra_df,ionmode = input.ion.mode,
                                                            mzabs = input.binSize, ppm = input.ppm,
-                                   rules = c(ads, nls), 
-                                   adducthyp = ads[grep("[M", ads, fixed = TRUE)],mainpkthr = 0.3, 
+                                   rules = c(ads, nls), mainpkthr = 0.3,
+                                   adducthyp = ads[grep("[M", ads, fixed = TRUE)],
                                    collapseResults = FALSE )
-
+      ##mainpkthr = 0.3 - ramclustr
 
       
       findMAIN_res_summarytable <- summary(findMAIN_res)
@@ -659,6 +659,13 @@ if (input.isotopes.adducts == TRUE){
                                 dplyr::group_by(mz) %>%
                                 dplyr::slice_max(raw_intensity, n = 1, with_ties = FALSE) %>%
                                 dplyr::ungroup()
+  
+  samples_adducts_consensus$neutral_mass_round = round( samples_adducts_consensus$neutral_mass,4)
+  
+  samples_adducts_consensus <- samples_adducts_consensus %>%
+                              dplyr::group_by(neutral_mass_round) %>%
+                              dplyr::slice_max(raw_intensity, n = 1, with_ties = FALSE) %>%
+                              dplyr::ungroup()
 
   write.table(x = samples_adducts_consensus,
                 file = paste0(data.folder, "Samples_adducts.csv"), sep=",", row.names=FALSE, quote = F)
