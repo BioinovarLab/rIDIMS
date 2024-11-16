@@ -495,17 +495,24 @@ for (file in 1:nrow(samples.info) ) {
           #findMAIN_best_result_noNA$sample_mz[adduct_cc] <- sample_mz_val
         }
       }
+      
       findMAIN_best_result_noNA$file <- samples.info$sample[file]
       
-      
-      png(paste0(dir_adduts,samples.info$sample[file],"_",findMAIN_neutral_mass,"_",iso_cc,".png"), width  = 3.25*2, 
-          height = 3.25, units = "in",  res  = 600, pointsize = 2.5)
-      par(cex.main=1, cex.lab=1,cex.axis=0.8,cex=2.5)
-        InterpretMSSpectrum::PlotSpec(x = findMAIN_best_result, 
-                                txt = findMAIN_best_result[, c("mz", "adduct")], 
-                                cutoff = 0, masslab = 0, 
-                                ylim = c(0,  1.5 * max(findMAIN_best_result[, 2])) )
-      dev.off()
+      findMAIN_best_result_noNA.temp <- findMAIN_best_result_noNA %>%
+                        dplyr::group_by(neutral_mass) %>%
+                        dplyr::slice_max(raw_intensity, n = 1, with_ties = FALSE) %>%
+                        dplyr::ungroup()
+        
+        png(paste0(dir_adduts,samples.info$sample[file],"_",
+                   round(findMAIN_best_result_noNA.temp$mz[1],5),"_",iso_cc,".png"), width  = 3.25*2,
+        height = 3.25, units = "in",  res  = 600, pointsize = 2.5)
+        par(cex.main=1, cex.lab=1,cex.axis=0.8,cex=2.5)
+          InterpretMSSpectrum::PlotSpec(x = findMAIN_best_result,
+                    txt = findMAIN_best_result[, c("mz", "adduct")],
+                    cutoff = 0, masslab = 0,
+                    ylim = c(0,  1.5 * max(findMAIN_best_result[, 2])) )
+        dev.off()
+      rm(findMAIN_best_result_noNA.temp)
 
                               
       all_adducts_list[[iso_cc]] <- findMAIN_best_result_noNA
@@ -521,6 +528,7 @@ for (file in 1:nrow(samples.info) ) {
       dplyr::filter(raw_intensity == max(raw_intensity)) %>%
       dplyr::ungroup()
     
+
     samples_adducts_list[[file]] <- final_adducts_df
 
     cat('\n\n### Adducts ', '\n\n')

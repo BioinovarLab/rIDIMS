@@ -210,7 +210,11 @@ server <- function(input, output,session) {
       unlink(paste0(data.folder,"Output_Spectra"),recursive=TRUE)
     }
 
-    data.file.names <- dir(data.folder, full.names = TRUE, pattern = ".CDF|.cdf|.mzXML|.mzML|.mzml|.MZML",recursive = T)
+    #data.file.names <- dir(data.folder, full.names = TRUE, pattern = ".CDF|.cdf|.mzXML|.mzML|.mzml|.MZML",recursive = T)
+    data.file.names <- dir(data.folder,
+      full.names = TRUE,
+      pattern = "\\.(mzML|mzml|MZML|mzXML|cdf|CDF)$",
+      recursive = TRUE    )
 
     #shQuote(normalizePath(paste0(data.folder
 
