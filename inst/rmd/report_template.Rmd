@@ -195,9 +195,9 @@ cat('\n\n## Setting Parameters', '\n')
     cat('\n\n### Low-Resolution Data', '\n')
   }
 
-cat('\n\n * Bin size: ', as.numeric(session.parameters[2,1]) , '\n')
-cat('\n\n * Signal Noise Ratio (SNR) threshold: ', as.numeric(session.parameters[3,1]) , '\n')
-cat('\n\n * ppm for grouping of mass peaks: ',as.numeric( session.parameters[6,1]) , '\n')
+cat('\n\n * Bin size: ', as.numeric(session.parameters$BinSize.PPM ) , '\n')
+#cat('\n\n * Signal Noise Ratio (SNR) threshold: ', as.numeric(session.parameters$Snthresh ) , '\n')
+cat('\n\n * ppm for grouping of mass peaks: ',as.numeric( session.parameters$PPM ) , '\n')
 
 cat('\n\n## Processing the files', '\n')
 
@@ -390,10 +390,10 @@ for (file in 1:nrow(samples.info) ) {
     }
 
   
-    save(ChromPeaks.data,input.ppm, samples.info,
-         session.parameters,
-         status.files,
-         file=paste0(data.folder, "chrompeaks.Rda"))
+    # save(ChromPeaks.data,input.ppm, samples.info,
+    #      session.parameters,
+    #      status.files,
+    #      file=paste0(data.folder, "chrompeaks.Rda"))
   
     
 ################### --------->>>>>
@@ -688,12 +688,12 @@ if (input.isotopes.adducts == TRUE){
 
 set.seed(12345)
 
-        save(data.folder,
-             samples.info,input.binSize,
-             status.files,samples_adducts_list,output.folder,
-             merged.status.files,
-             file=paste0(data.folder, "variables_step_2.Rda") 
-         )
+        # save(data.folder,
+        #      samples.info,input.binSize,
+        #      status.files,samples_adducts_list,output.folder,
+        #      merged.status.files,
+        #      file=paste0(data.folder, "variables_step_2.Rda") 
+        #  )
 
   if (debug_app==TRUE){
         save(data.folder,
@@ -1506,11 +1506,11 @@ if (nrow(samples.info) >= 2){
     legend("topright", col = cores[unique(df.export.mean$class)], legend = obj.df.export.class.mean$name, pch = 15)
     abline(h = -0.07, lty = 1,lwd = 1.6, col="black")
     
-    save(obj.df.export.class.mean,
-         cores,
-         df.export.mean,
-         file=paste0(data.folder, "plot_vars_.Rda") 
-     )
+    # save(obj.df.export.class.mean,
+    #      cores,
+    #      df.export.mean,
+    #      file=paste0(data.folder, "plot_vars_.Rda") 
+    #  )
     
     
     write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Plotting mean spectra per class'),file=log.file,append=TRUE)
@@ -1546,10 +1546,10 @@ if (nrow(samples.info) >= 2){
 
 if (input.isotopes.adducts == TRUE){
  
-save(df.export,samples_adducts_consensus,
-    merged.status.files,
-    file=paste0(data.folder, "variables_debug.Rda") 
-)
+# save(df.export,samples_adducts_consensus,
+#     merged.status.files,
+#     file=paste0(data.folder, "variables_debug.Rda") 
+# )
   
 sample_mz <- colnames(df.export)[3:ncol(df.export)]
 resultado_mapping <- mapear_sample_mz_adductmz(sample_mz, samples_adducts_consensus) %>% as.data.frame()
@@ -1573,24 +1573,24 @@ write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': END' ),file=log.file,app
 write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Session parameters: ' ),file=log.file,append=TRUE)
 #write.table(format(session.parameters),file=log.file, append = TRUE, col.names = F)
 
-write(paste0( "Resolution mode = " , as.character(session.parameters[1,1]) ),file=log.file,append=TRUE)
-write(paste0( "BinSize.PPM = " ,     as.character(session.parameters[2,1]) ),file=log.file,append=TRUE)
-write(paste0( "SNR treshold = " , as.character(session.parameters[3,1]) ),file=log.file,append=TRUE)
-write(paste0( "aggregationFun = " , as.character(session.parameters[4,1]) ),file=log.file,append=TRUE)
-write(paste0( "Make replicates = " , as.character(session.parameters[5,1]) ),file=log.file,append=TRUE)
-write(paste0( "PPM of mass peaks grouping = " , as.character(session.parameters[6,1]) ),file=log.file,append=TRUE)
-write(paste0( "Filter spectrum intensity by = " , as.character(session.parameters[7,1]) ),file=log.file,append=TRUE)
-write(paste0( "Name of the class to subtract = " , as.character(session.parameters[8,1]) ),file=log.file,append=TRUE)
-write(paste0( "Minimum fold change = " , as.character(session.parameters[9,1]) ),file=log.file,append=TRUE)
-write(paste0( "Filter chromatogram by = " , as.character(session.parameters[10,1]) ),file=log.file,append=TRUE)
-write(paste0( "Class filter type = " , as.character(session.parameters[11,1]) ),file=log.file,append=TRUE)
-write(paste0( "Class filter value = " , as.character(session.parameters[12,1]) ),file=log.file,append=TRUE)
-write(paste0( "Replicate filter = " , as.character(session.parameters[13,1]) ),file=log.file,append=TRUE)
-write(paste0( "Replicate filter value = " , as.character(session.parameters[14,1]) ),file=log.file,append=TRUE)
-write(paste0( "Make heatmaps = " , as.character(session.parameters[15,1]) ),file=log.file,append=TRUE)
-write(paste0( "Ion mode = " , as.character(session.parameters[15,1]) ),file=log.file,append=TRUE)
-write(paste0( "Report code = " , as.character(session.parameters[16,1]) ),file=log.file,append=TRUE)
-write(paste0( "Data folder = " , as.character(session.parameters[20,1]) ),file=log.file,append=TRUE)
+write(paste0( "Resolution mode = " , as.character(session.parameters$MS ) ),file=log.file,append=TRUE)
+write(paste0( "BinSize.PPM = " ,     as.character(session.parameters$BinSize.PPM ) ),file=log.file,append=TRUE)
+write(paste0( "SNR treshold = " , as.character(session.parameters$Snthresh ) ),file=log.file,append=TRUE)
+write(paste0( "aggregationFun = " , as.character(session.parameters$aggregationFun ) ),file=log.file,append=TRUE)
+write(paste0( "Make replicates = " , as.character(session.parameters$replicates ) ),file=log.file,append=TRUE)
+write(paste0( "PPM of mass peaks grouping = " , as.character(session.parameters$PPM ) ),file=log.file,append=TRUE)
+write(paste0( "Filter spectrum intensity by = " , as.character(session.parameters$Tresh.RA ) ),file=log.file,append=TRUE)
+write(paste0( "Name of the class to subtract = " , as.character(session.parameters$Subtract ) ),file=log.file,append=TRUE)
+write(paste0( "Minimum fold change = " , as.character(session.parameters$MinFold ) ),file=log.file,append=TRUE)
+write(paste0( "Filter chronogram by = " , as.character(session.parameters$Chr.limit ) ),file=log.file,append=TRUE)
+write(paste0( "Class filter type = " , as.character(session.parameters$ClassFilter ) ),file=log.file,append=TRUE)
+write(paste0( "Class filter value = " , as.character(session.parameters$ClassFilterValue ) ),file=log.file,append=TRUE)
+write(paste0( "Replicate filter = " , as.character(session.parameters$ReplicateFilter ) ),file=log.file,append=TRUE)
+write(paste0( "Replicate filter value = " , as.character(session.parameters$ReplicateFilterValue ) ),file=log.file,append=TRUE)
+write(paste0( "Make heatmaps = " , as.character(session.parameters$MakeHeatmaps ) ),file=log.file,append=TRUE)
+write(paste0( "Ion mode = " , as.character(session.parameters$ion_mode ) ),file=log.file,append=TRUE)
+write(paste0( "Report code = " , as.character(session.parameters$ReportSerial ) ),file=log.file,append=TRUE)
+write(paste0( "Data folder = " , as.character(session.parameters$Data.folder ) ),file=log.file,append=TRUE)
 
 ##############################
 ################# parallel Stop cluster ##

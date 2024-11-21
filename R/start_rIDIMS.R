@@ -168,23 +168,15 @@ server <- function(input, output,session) {
   #input.msresolution
   observeEvent(input$input.msresolution, {
     if((input$input.msresolution=="low.res")) {
-      #shinyjs::hide(id = "input.scales");
-      #shinyjs::hide(id = "input.peakThr");
       shinyjs::hide(id = "input.isotopes.adducts");
       updateTextInput(session, "input.ppm",  label = "ppm for grouping of mass peaks (low.res)", value = "200")
       updateTextInput(session, "input.binSize",  label = "binSize (Dalton)", value = "1")
-      #shinyjs::show(id = "input.binSize");
-      #shinyjs::show(id = "input.snthresh");
 
     }
     if((input$input.msresolution=="high.res")) {
-      #shinyjs::show(id = "input.scales");
-      #shinyjs::show(id = "input.peakThr");
       shinyjs::show(id = "input.isotopes.adducts");
       updateTextInput(session, "input.ppm",  label = "ppm for grouping of mass peaks (high.res)", value = "10")
       updateTextInput(session, "input.binSize",  label = "binSize (Dalton)", value = "0.00001")
-      #shinyjs::hide(id = "input.binSize");
-      #shinyjs::hide(id = "input.snthresh");
     }
 
   }, ignoreInit = TRUE, ignoreNULL = FALSE) #end input.msresolution
@@ -237,7 +229,7 @@ server <- function(input, output,session) {
       stop()
     }
 
-    save(data.file.names,samples.info, data.folder, file = paste0(data.folder,"data.file.Rda"))
+    #save(data.file.names,samples.info, data.folder, file = paste0(data.folder,"data.file.Rda"))
 
     writexl::write_xlsx(samples.info,paste0(data.folder,"/samples.info.xlsx"))
 
@@ -245,20 +237,9 @@ server <- function(input, output,session) {
 
     system2("open", shQuote(normalizePath(paste0(data.folder,"samples.info.xlsx"))))
 
-    # if(.Platform$OS.type == "unix") {
-    # } else {
-    #   base::shell.exec(normalizePath(paste0(data.folder,"samples.info.xlsx")))
-    # }
-
 
     session.vars$data.folder <- data.folder
     removeModal()
-    # withProgress(message = "Loading file...", value = 0, {
-    #   for (i in 1:10) {
-    #     Sys.sleep(0.05)
-    #     incProgress(1/10)
-    #   }
-    # })
 
   }) #end create.sample.filo.btn
 
@@ -277,10 +258,7 @@ server <- function(input, output,session) {
     samples.info <- readxl::read_excel(paste0(data.folder,"/samples.info.xlsx"), col_names = T)
 
     fig <- plotly::plot_ly()
-    #fig <- fig %>% add_pie(samples.info, labels = samples.info$type, values = 1, type = 'pie',
-    #                       textposition = 'inside',
-    #                       textinfo = 'label+percent',
-    #                       domain = list(row = 0, column = 0))
+
     fig <- fig %>% add_pie(samples.info, labels = samples.info$class, values = 1, type = 'pie',
                            textposition = 'inside',
                            textinfo = 'label+percent',
@@ -304,9 +282,6 @@ server <- function(input, output,session) {
     session.vars$debug_app <- debug_app
     session.vars$QC_app <- QC_app
     removeModal()
-
-    #@loadSupport("teste.funcoes.R")
-    #source("teste.funcoes.R")
 
   }) #end selec.sample.filo.btn
 
@@ -418,7 +393,7 @@ server <- function(input, output,session) {
     showModal(modalDialog(paste0("Processing the files. Wait ...",
                                  "Open the log file in the data folder to track updates."), footer=NULL,size = "l"))
 
-    session.parameters <- data.frame(values = t(data.frame(
+    session.parameters <- list(
       MS = input.msresolution,
       BinSize.PPM = input.binSize,
       Snthresh = input.snthresh,
@@ -439,8 +414,9 @@ server <- function(input, output,session) {
       QC_app = QC_app,
       ion_mode = input.ion.mode,
       PackageVersion = packageVersion("rIDIMS"),
-      Data.folder=data.folder,
-      Output.folder=output.folder)))
+      Data.folder = data.folder,
+      Output.folder = output.folder
+    )
 
     if (debug_app==TRUE){
       save(session.parameters,file=paste0(data.folder,"session.par.Rda"))
@@ -464,7 +440,7 @@ server <- function(input, output,session) {
     report.name <- paste0("Report_", report.serial  )
     rmarkdown::render(system.file("rmd", "report_template.Rmd", package = "rIDIMS"), output_dir=data.folder,
                         output_file=report.name)
-    #print(script.error)
+
     removeModal()
 
     system2("open", shQuote(normalizePath(paste0(data.folder, report.name,".html" ))))
