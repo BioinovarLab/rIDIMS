@@ -337,13 +337,25 @@ for (file in 1:nrow(samples.info) ) {
         ggplot2::theme_bw() 
       print(p1)
 
-      
-        #make replicates and/or combine:
-    if (make.replicates == "TRUE"){
+    
+      low_quality_scans = FALSE
+      if (nrow(temp.chrom.data) < 6) {
+        low_quality_scans = TRUE
+      }
+        
+    #make replicates and/or combine:
+    if (make.replicates == "TRUE" & low_quality_scans == FALSE){
       message(" making replicates ... ")
       write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
        ':   Make replicates'),file=log.file,append=TRUE)
     
+      
+    # save(ChromPeaks.data,
+    #      aggregationFun,percent.limit,temp.visual.df,chrom.data,
+    #      log.file,temp.chrom.data,chrom.data.item1.df,
+    #      file=paste0(data.folder, "variables_step_debug.Rda") 
+    #  )
+      
       
       temp.chrom.data$cluster <- anticlust::anticlustering(
         temp.chrom.data, 
@@ -380,6 +392,15 @@ for (file in 1:nrow(samples.info) ) {
       }
        
     }else{
+      
+      if (low_quality_scans == TRUE){
+          write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+          ':   File with low quality scans OR incorrectly configured parameters. Unable to select minimum number of scans.'),file=log.file,append=TRUE)
+        
+        cat('\n\n#### ', 'Attention: File with low quality scans OR incorrectly configured parameters. Unable to select minimum number of scans.' , '\n\n')
+        
+      }
+      
       #no replicates:
       write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
       ':   No replicates'),file=log.file,append=TRUE)
@@ -868,6 +889,11 @@ plot.pca <- ggplot2::ggplot(scores, aes(x = PC1, y = PC2, color = class)) +
 print(plot.pca)
 
 #----------- end of pca
+}else{
+  
+write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+  ': Unable to perform PCA.'  ),file=log.file,append=TRUE)
+  
 }
 
 
@@ -1448,17 +1474,7 @@ if ( n.total.classes > 0 ){
     #zeros <- colSums(class.filtered.hm) == 0
     #class.filtered.hm <- subset(class.filtered.hm, select = !c(zeros))
     
-    if (input.make.heatmaps == "TRUE"){
-      ##cat('\n\n## Heatmap (class filtered) \n\n') 
-      cat('\n\n## Hierarchical clustering heatmap (processed) \n') 
-      cat('\n\n Hierarchical clustering heatmap of the samples (in rows) and m/z values (columns) of the dataset after processing. The color represents m/z intensity values.  \n\n') 
-      write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
-        ': Creating heatmap: ', ncol(class.filtered.hm), " number of columns" ),file=log.file,append=TRUE)
-      heatmap(as.matrix(class.filtered.hm), labRow=df.export$class)
-    }
-
-if (nrow(samples.info) >= 2){
-    
+    if (nrow(samples.info) >= 2){
     #---------- pca
     cat('\n\n## PCA (processed) \n\n') 
     cat('\n\n  PCA of the dataset after processing. Note that the PCA analysis was performed for data visualization purposes only, no normalization algorithm was executed prior to the analysis. \n\n') 
@@ -1478,6 +1494,17 @@ if (nrow(samples.info) >= 2){
     #----------- end of pca
 }
     
+    
+    if (input.make.heatmaps == "TRUE"){
+      ##cat('\n\n## Heatmap (class filtered) \n\n') 
+      cat('\n\n## Hierarchical clustering heatmap (processed) \n') 
+      cat('\n\n Hierarchical clustering heatmap of the samples (in rows) and m/z values (columns) of the dataset after processing. The color represents m/z intensity values.  \n\n') 
+      write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),
+        ': Creating heatmap: ', ncol(class.filtered.hm), " number of columns" ),file=log.file,append=TRUE)
+      heatmap(as.matrix(class.filtered.hm), labRow=df.export$class)
+    }
+
+
     df.export.mean <- df.export %>% 
                       dplyr::group_by(class) %>%
                       dplyr::summarise(dplyr::across(tidyselect::where(is.numeric),base::mean))
@@ -1535,6 +1562,13 @@ if (nrow(samples.info) >= 2){
 
   #din <- data.table::fread(file="C:/Users/Planck/Documents/MTBLS117/Data_metaboanalyst_class_filtered_80.csv", header = T)
 
+}else{
+  
+  
+  write(paste0(format(Sys.time(), "%Y-%m-%d_%H-%M-%S"),': Attention! Processing resulted in insufficient number of samples per class. Check the parameters used for correct visualization of the processed spectra.'),file=log.file,append=TRUE)
+  
+  cat('\n\n### Attention! Processing resulted in insufficient number of samples per class. Check the parameters used for correct visualization of the processed spectra. \n\n') 
+  
 }
 
 ```
