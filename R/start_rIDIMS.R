@@ -22,9 +22,9 @@
 #' @importFrom tidyr gather
 #' @importFrom stats aggregate
 #' @importFrom InterpretMSSpectrum findMAIN summary
+#' @importFrom signal
+#' @importFrom MSnbase
 #'
-
-
 
 start_rIDIMS <- function() {
 debug_app=FALSE
