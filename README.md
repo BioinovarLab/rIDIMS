@@ -15,7 +15,7 @@ This example is from a single sample. In this single run (injection) there are T
 The goal is to extract valid scans from this spectrum in a rational and reproducible manner. To do this, the rIDIMS algorithm removes regions with zeroed scans and noise, and then selects TICs that present values above an established threshold (that contains valid scans).
 Therefore, in a chronogram there are several scans of **the same sample** that can be combined into consensus spectra. 
 * For cases where there is only one sample that can be analyzed and the analyst wants to obtain scans in representative sets of that sample, the analyst can choose to create in-silico replicas. Since these are valid scans of the same sample, we suggest an innovation: the creation of in-silico replicas. That is: selection of valid scans and grouping of these scans into 3 groups to form a triplicate.
-More details about this innovation can be found in our publication: <>. Where we show how to form these sets in a way that they do not present statistical differences between them.
+More details about this innovation can be found in our publication: https://doi.org/10.1016/j.talanta.2024.127273. Where we show how to form these sets in a way that they do not present statistical differences between them.
 
 ## Installation (Recommended)
 
