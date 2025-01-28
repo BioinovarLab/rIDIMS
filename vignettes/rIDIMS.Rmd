@@ -29,7 +29,7 @@ In this tutorial we will demonstrate the advantage of generating in-silico repli
 
 # Data:  Coffea arabica and Coffea canephora Beans
 
-We used the MasSpec pen coupled to a mass spectrometer (LTQ-XL, Thermo Scientific) to quickly and directly analyze the chemical profiles of coffee beans from 2 coffee species: Coffea arabica L. (arabica) and Coffea canephora var. robust (robust). In summary, the dataset consists of 64 files divided into the following categories: blank, Arabica coffee and Robusta coffee. \
+We used the MasSpec pen coupled to a mass spectrometer (LTQ-XL, Thermo Scientific) to quickly and directly analyze the chemical profiles of coffee beans from 2 coffee species: *Coffea arabica* L. (arabica) and *Coffea canephora* var. robust (robust). In summary, the dataset consists of 64 files divided into the following categories: blank, Arabica coffee and Robusta coffee. \
 To demonstrate the usefulness of generating in-silico replicas, in this example we will use only 3 mzML files representative of each category.
 
 # Installation
@@ -43,7 +43,7 @@ install.packages("pak")
 After that install rIDIMS: 
 
 ```{r setup2, echo = T, message = FALSE, warning=FALSE, eval=FALSE}
-pak::pkg_install("url::https://github.com/BioinovarLab/rIDIMS/releases/download/v0.5.00/rIDIMS_0.5.00.tar.gz")
+pak::pkg_install("url::https://github.com/BioinovarLab/rIDIMS/releases/download/v0.6.5/rIDIMS_0.6.5.tar.gz")
 ```
 
 \
