@@ -48,7 +48,6 @@ start_rIDIMS()
 * **Linux:** Make sure to have `r-base-dev` installed. *[HowTO](https://cran.r-project.org/bin/linux/debian/)*. 
 * **OSX:** Make sure to have `Xcode` developer tools from Apple installed. *[Tutorial](https://mac.r-project.org/tools/)*. 
 
-
 ### [Click here for the extended tutorial.](https://bioinovarlab.github.io/rIDIMS/articles/rIDIMS.html)
 
 
